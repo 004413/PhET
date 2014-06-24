@@ -1,12 +1,23 @@
 <body>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.2/raphael-min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<link rel="sylesheet" href="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.2/jquery.mobile.min.css" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+	<script src="PhETlib.js"></script>
 	<script>
-		var canvas = Raphael(0,0,500,500);
-		var circle = canvas.circle(50, 50, 30).attr({fill:'blue'});
+		var canvas = Raphael(0,0,1000,1000);
+		//**Raphael testing of shapes and dragging**
+		
+		/*var circle = canvas.circle(50, 50, 30).attr({fill:'blue'});
 		var rect = canvas.rect(150, 150, 100, 200);
 		var text = canvas.text(150,50,'test1')
 		.attr({fill:'red', 'font-size': '16pt', 'font-weight': 'bold'});
+		circle.drag(function(dx,dy,x,y){this.attr({cx:x, cy:y, fill:'green'})}, function(){this.attr({r:50})}, function() {this.attr({r:30,fill:'blue'})})*/
 		
-		circle.drag(function(dx,dy,x,y){this.attr({cx:x, cy:y, fill:'green'})}, function(){this.attr({r:50})}, function() {this.attr({r:30,fill:'blue'})}) 
+		function printSlider(x) {
+			console.log(x);	
+		}
+		slider(canvas,50,50,500,100);
 	</script>
 </body>
