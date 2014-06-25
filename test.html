@@ -12,27 +12,7 @@
 		sliders.push(sliderA, sliderB);
 		
 		drawLine(sliderA.val,sliderB.val);
-		
-		/*sliders.click(function() {
-			console.log('click');
-			drawLine(sliderA.val, sliderB.val);
-		});*/
+
 		setInterval(function() { drawLine(sliderA.val,sliderB.val);}, 200);
-		//**Raphael testing of shapes and dragging**
-		
-		/*var circle = canvas.circle(50, 50, 30).attr({fill:'blue'});
-		var rect = canvas.rect(150, 150, 100, 200);
-		var text = canvas.text(150,50,'test1')
-		.attr({fill:'red', 'font-size': '16pt', 'font-weight': 'bold'});
-		circle.drag(function(dx,dy,x,y){this.attr({cx:x, cy:y, fill:'green'})}, function(){this.attr({r:50})}, function() {this.attr({r:30,fill:'blue'})})*/
-		
-		//var dispA = canvas.text(30, 100, 0);
-		/*setInterval(function() { 
-			console.log('sliderA.val = ' + sliderA.val);
-			var a = sliderA.val
-			dispA.attr('text', sliderA.val) }, 200);*/
-		/*var sliderB = new slider(canvas,100,200,50,10,-10,10);
-		var dispB = canvas.text(30, 250, sliderB.val);
-		setInterval(function() { dispB.attr('text', sliderB.val); }, 200);*/
 	</script>
 </body>
