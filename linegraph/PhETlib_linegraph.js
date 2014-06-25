@@ -35,9 +35,6 @@ if(a===0){ // case of a horizontal line
   var intersectsBottom = ((X_MIN < x_when_y_is_MIN)&&(x_when_y_is_MIN <= X_MAX))
   var intersectsRight = ((Y_MIN < y_when_x_is_MAX)&&(y_when_x_is_MAX <= Y_MAX))
   var intersectsTop = ((X_MIN <= x_when_y_is_MAX)&&(x_when_y_is_MAX < X_MAX))
-  if(intersectsLeft+intersectsBottom+intersectsRight+intersectsTop!=2){
-    console.log("Uhhh...");
-  }
   /* Get coordinates of where line intersects the edge of the coordinate grid, to get two points by which to define a line */
   if(intersectsLeft){
     var point1 = [X_MIN , y_when_x_is_MIN];
