@@ -19,7 +19,7 @@ function pointToPathNotation(point){
   return [newX,newY]
 }
 
-var coeffs = [1,2]; // coefficients of line (y=ax+b)
+var coeffs = [-4,3]; // coefficients of line (y=ax+b)
 var a = coeffs[0]; // slope
 var b = coeffs[1]; // y-intercept
 if(a===0){ // case of a horizontal line
@@ -30,16 +30,34 @@ if(a===0){ // case of a horizontal line
   var y_when_x_is_MIN = a*X_MIN+b;
   var x_when_y_is_MAX = (Y_MAX-b)/a;
   var x_when_y_is_MIN = (Y_MIN-b)/a;
-  /* Get coordinates of where line intersects the edge of the coordinate grid, to get two points by which to define a line */
-  if((Y_MIN < y_when_x_is_MIN)&&(y_when_x_is_MIN < Y_MAX)){
-    var point1 = [X_MIN , y_when_x_is_MIN];
-  } else {
-    var point1 = [x_when_y_is_MIN , Y_MIN];
+  /* Corner cases in the following are associated with the edge in the clockwise direction */
+  var intersectsLeft = ((Y_MIN <= y_when_x_is_MIN)&&(y_when_x_is_MIN < Y_MAX))
+  var intersectsBottom = ((X_MIN < x_when_y_is_MIN)&&(x_when_y_is_MIN <= X_MAX))
+  var intersectsRight = ((Y_MIN < y_when_x_is_MAX)&&(y_when_x_is_MAX <= Y_MAX))
+  var intersectsTop = ((X_MIN <= x_when_y_is_MAX)&&(x_when_y_is_MAX < X_MAX))
+  if(intersectsLeft+intersectsBottom+intersectsRight+intersectsTop!=2){
+    console.log("Uhhh...");
   }
-  if((Y_MIN < y_when_x_is_MAX)&&(y_when_x_is_MAX < Y_MAX)){
-    var point2 = [X_MAX , y_when_x_is_MAX];
-  } else {
-    var point2 = [x_when_y_is_MAX , Y_MAX];
+  /* Get coordinates of where line intersects the edge of the coordinate grid, to get two points by which to define a line */
+  if(intersectsLeft){
+    var point1 = [X_MIN , y_when_x_is_MIN];
+    if(intersectsBottom){
+      var point2 = [x_when_y_is_MIN , Y_MIN];
+    }else if(intersectsRight){
+      var point2 = [X_MAX , y_when_x_is_MAX];
+    }else if(intersectsTop){
+      var point2 = [x_when_y_is_MAX , Y_MAX];
+    }
+  }else if(intersectsBottom){
+    var point1 = [x_when_y_is_MIN , Y_MIN];
+    if(intersectsRight){
+      var point2 = [X_MAX , y_when_x_is_MAX];
+    }else if(intersectsTop){
+      var point2 = [x_when_y_is_MAX , Y_MAX];
+    }
+  }else{
+    var point1 = [x_when_y_is_MAX , Y_MAX];
+    var point2 = [X_MAX , y_when_x_is_max];
   }
 }
 var pathPoint1 = pointToPathNotation(point1);
