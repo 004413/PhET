@@ -13,17 +13,14 @@
 		.attr({fill:'red', 'font-size': '16pt', 'font-weight': 'bold'});
 		circle.drag(function(dx,dy,x,y){this.attr({cx:x, cy:y, fill:'green'})}, function(){this.attr({r:50})}, function() {this.attr({r:30,fill:'blue'})})*/
 		
-		/*function printSlider(x) {
-			console.log(x);	
-		}*/
-		var sliderA = new slider(canvas,100,50,500,100,0,20);
-		var dispA = canvas.text(30, 100, 0);
-		setInterval(function() { 
+		var sliderA = new slider(canvas,100,50,500,100,-10,10);
+		//var dispA = canvas.text(30, 100, 0);
+		/*setInterval(function() { 
 			console.log('sliderA.val = ' + sliderA.val);
-			//var a = sliderA.val
-			dispA.attr('text', sliderA.val) }, 200);
-		var sliderB = new slider(canvas,100,200,500,100,-10,10);
+			var a = sliderA.val
+			dispA.attr('text', sliderA.val) }, 200);*/
+		/*var sliderB = new slider(canvas,100,200,50,10,-10,10);
 		var dispB = canvas.text(30, 250, sliderB.val);
-		setInterval(function() { dispB.attr('text', sliderB.val); }, 200);
+		setInterval(function() { dispB.attr('text', sliderB.val); }, 200);*/
 	</script>
 </body>
