@@ -6,10 +6,9 @@ var Y_MIN = -Y_MAX;
 var RES = 12;
 var R_WIDTH = RES*(X_MAX-X_MIN);
 var R_HEIGHT = RES*(Y_MAX-Y_MIN);
-var canvas = Raphael(0,0,R_WIDTH,R_HEIGHT);
-var X_AXIS = canvas.path("M0 "+R_HEIGHT/2+"L"+R_WIDTH+" "+R_HEIGHT/2);
-var Y_AXIS = canvas.path("M"+R_WIDTH/2+" 0L"+R_WIDTH/2+" "+R_HEIGHT);
-
+lineCanvas = Raphael(0,0,R_WIDTH,R_HEIGHT);
+var X_AXIS = lineCanvas.path("M0 "+R_HEIGHT/2+"L"+R_WIDTH+" "+R_HEIGHT/2);
+var Y_AXIS = lineCanvas.path("M"+R_WIDTH/2+" 0L"+R_WIDTH/2+" "+R_HEIGHT);
 var GRAPH_SLIDER_MARGIN = 20;
 var MARGIN = 20;
 var SLOPE_MAX = 60;
@@ -24,6 +23,10 @@ function pointToPathNotation(point){
 }
 
 function drawLine(slope,yintercept){
+  lineCanvas.remove();
+  lineCanvas = Raphael(0,0,R_WIDTH,R_HEIGHT);
+  var X_AXIS = lineCanvas.path("M0 "+R_HEIGHT/2+"L"+R_WIDTH+" "+R_HEIGHT/2);
+  var Y_AXIS = lineCanvas.path("M"+R_WIDTH/2+" 0L"+R_WIDTH/2+" "+R_HEIGHT);
   var a = slope; // slope
   var b = yintercept; // y-intercept
   if(a==0){ // case of a horizontal line
@@ -63,7 +66,5 @@ function drawLine(slope,yintercept){
   }
   var pathPoint1 = pointToPathNotation(point1);
   var pathPoint2 = pointToPathNotation(point2);
-  var plottedLine = canvas.path("M"+pathPoint1[0]+" "+pathPoint1[1]+"L"+pathPoint2[0]+" "+pathPoint2[1]);
+  var plottedLine = lineCanvas.path("M"+pathPoint1[0]+" "+pathPoint1[1]+"L"+pathPoint2[0]+" "+pathPoint2[1]);
 }
-
-drawLine(-3.4,0.3)
