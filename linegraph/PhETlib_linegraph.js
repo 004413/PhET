@@ -19,10 +19,10 @@ function pointToPathNotation(point){
   return [newX,newY]
 }
 
-var coeffs = [-4,3]; // coefficients of line (y=ax+b)
+var coeffs = [0.6,2.3]; // coefficients of line (y=ax+b)
 var a = coeffs[0]; // slope
 var b = coeffs[1]; // y-intercept
-if(a===0){ // case of a horizontal line
+if(a==0){ // case of a horizontal line
   var point1 = [X_MIN,b];
   var point2 = [X_MAX,b];
 } else { // case of a non-horizontal line
