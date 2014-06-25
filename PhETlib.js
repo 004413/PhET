@@ -8,6 +8,7 @@ function slider(canvas, x, y, w, h, minVal, maxVal) {
 	var self = this;
 	self.val = parseFloat(minVal).toFixed(3);
 	var disp = canvas.text((x + (w/2)), (y - 10), self.val);
+	body.attr({fill:'white'});
 	handle.attr({fill:'gray'});
 	body.node.setAttribute('class', 'slider');
 	
