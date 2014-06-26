@@ -61,7 +61,7 @@ function drawLine(slope,yintercept){
       }
     }else{
       var point1 = [x_when_y_is_MAX , Y_MAX];
-      var point2 = [X_MAX , y_when_x_is_max];
+      var point2 = [X_MAX , y_when_x_is_MAX];
     }
   }
   var pathPoint1 = pointToPathNotation(point1);
