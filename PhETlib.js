@@ -41,7 +41,7 @@ function slider(canvas, x, y, w, h, minVal, maxVal) {
 				var bodyX = body.attr('x');
 				var barDist = (handleX + (handleW / 2)) - bodyX;
 				var value = (barDist / w) * (maxVal - minVal) + minVal;
-				self.val = parseFloat(value).toFixed(3) //value based on position of slider bar
+				self.val = parseFloat(value).toFixed(3); //value based on position of slider bar
 				if (handleX == bodyX) {
 					self.val = parseFloat(minVal).toFixed(3);	
 				}
