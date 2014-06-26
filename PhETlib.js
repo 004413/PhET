@@ -12,15 +12,31 @@ function slider(canvas, x, y, w, h, minVal, maxVal) {
 	handle.attr({fill:'gray'});
 	body.node.setAttribute('class', 'slider');
 	
+	function updateDisplay() {
+		var handleX = handle.attr('x');
+		var bodyX = body.attr('x');
+		var barDist = (handleX + (handleW / 2)) - bodyX;
+		var value = (barDist / w) * (maxVal - minVal) + minVal;
+		self.val = parseFloat(value).toFixed(3) //value based on position of slider bar
+		if (handleX == bodyX) {
+			self.val = parseFloat(minVal).toFixed(3);	
+		}
+		else if ((handleX + handleW) == (bodyX + w)) {
+			self.val = parseFloat(maxVal).toFixed(3);	
+		}
+		disp.attr('text', self.val);
+	}
+	
 	//move slider bar with mouse
 	handle.drag(function(dx,dy,mx,my) { //on move
 		var newX = Math.min(bodyX + w - handleW, mx);
 		var newX = Math.max(bodyX, newX);
 		this.attr({x:newX}) 
+		updateDisplay();
 	}, 
 			function() {}, //on start
 			function() { //on end
-				var handleX = handle.attr('x');
+				/*var handleX = handle.attr('x');
 				var bodyX = body.attr('x');
 				var barDist = (handleX + (handleW / 2)) - bodyX;
 				var value = (barDist / w) * (maxVal - minVal) + minVal;
@@ -31,6 +47,6 @@ function slider(canvas, x, y, w, h, minVal, maxVal) {
 				else if ((handleX + handleW) == (bodyX + w)) {
 					self.val = parseFloat(maxVal).toFixed(3);	
 				}
-				disp.attr('text', self.val);
+				disp.attr('text', self.val);*/
 			});
 }
