@@ -1,5 +1,5 @@
 //Creates custom svg slider element
-function slider(canvas, x, y, w, h, minVal, maxVal) { 
+function slider(canvas, x, y, w, h, minVal, maxVal, label) { 
 	var body = canvas.rect(x, y, w, h);
 	var handle = canvas.rect(x, y, (w/50), h);
 	var bodyX = body.attr('x');
@@ -7,7 +7,7 @@ function slider(canvas, x, y, w, h, minVal, maxVal) {
 	var handleW = handle.attr('width');
 	var self = this;
 	self.val = parseFloat(minVal).toFixed(3);
-	var disp = canvas.text((x + (w/2)), (y - 10), self.val);
+	var disp = canvas.text((x + (w/2)), (y - 10), label + ': ' +self.val);
 	body.attr({fill:'white'});
 	handle.attr({fill:'gray'});
 	body.node.setAttribute('class', 'slider');
@@ -16,15 +16,15 @@ function slider(canvas, x, y, w, h, minVal, maxVal) {
 		var handleX = handle.attr('x');
 		var bodyX = body.attr('x');
 		var barDist = (handleX + (handleW / 2)) - bodyX;
-		var value = (barDist / w) * (maxVal - minVal) + minVal;
-		self.val = parseFloat(value).toFixed(3) //value based on position of slider bar
+		var value = (barDist / w) * (maxVal - minVal) + minVal; //value based on position of slider bar
+		self.val = parseFloat(value).toFixed(3) 
 		if (handleX == bodyX) {
 			self.val = parseFloat(minVal).toFixed(3);	
 		}
 		else if ((handleX + handleW) == (bodyX + w)) {
 			self.val = parseFloat(maxVal).toFixed(3);	
 		}
-		disp.attr('text', self.val);
+		disp.attr('text', label + ': ' +self.val);
 	}
 	
 	//move slider bar with mouse
@@ -36,18 +36,5 @@ function slider(canvas, x, y, w, h, minVal, maxVal) {
 		updateDisplay();
 	}, 
 			function() {}, //on start
-			function() { //on end
-				/*var handleX = handle.attr('x');
-				var bodyX = body.attr('x');
-				var barDist = (handleX + (handleW / 2)) - bodyX;
-				var value = (barDist / w) * (maxVal - minVal) + minVal;
-				self.val = parseFloat(value).toFixed(3) //value based on position of slider bar
-				if (handleX == bodyX) {
-					self.val = parseFloat(minVal).toFixed(3);	
-				}
-				else if ((handleX + handleW) == (bodyX + w)) {
-					self.val = parseFloat(maxVal).toFixed(3);	
-				}
-				disp.attr('text', self.val);*/
-			});
+			function() {} ); //on end
 }

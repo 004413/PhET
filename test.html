@@ -8,11 +8,9 @@
 	<script>
 		var canvas = Raphael(0,0,1000,1000);
 		var sliders = canvas.set();
-		var sliderA = new slider(canvas,500,50,400,50,-10,10);
-		var sliderB = new slider(canvas,500,150,400,50,-10,10);
+		var sliderA = new slider(canvas,500,50,400,50,-10,10,'Slope');
+		var sliderB = new slider(canvas,500,150,400,50,-10,10,'Y-Int.');
 		
 		drawLine(sliderA.val,sliderB.val); //initial graph
-
-		//setInterval(function() { drawLine(sliderA.val,sliderB.val);}, 300);
 	</script>
 </body>
