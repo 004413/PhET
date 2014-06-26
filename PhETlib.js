@@ -32,6 +32,7 @@ function slider(canvas, x, y, w, h, minVal, maxVal) {
 		var newX = Math.min(bodyX + w - handleW, mx);
 		var newX = Math.max(bodyX, newX);
 		this.attr({x:newX}) 
+		drawLine(sliderA.val,sliderB.val);
 		updateDisplay();
 	}, 
 			function() {}, //on start
