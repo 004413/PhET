@@ -27,8 +27,8 @@ function drawLine(slope,yintercept){
   lineCanvas = Raphael(0,0,R_WIDTH,R_HEIGHT);
   var X_AXIS = lineCanvas.path("M0 "+R_HEIGHT/2+"L"+R_WIDTH+" "+R_HEIGHT/2);
   var Y_AXIS = lineCanvas.path("M"+R_WIDTH/2+" 0L"+R_WIDTH/2+" "+R_HEIGHT);
-  var a = slope; // slope
-  var b = yintercept; // y-intercept
+  var a = parseFloat(slope); // slope
+  var b = parseFloat(yintercept); // y-intercept
   if(a==0){ // case of a horizontal line
     var point1 = [X_MIN,b];
     var point2 = [X_MAX,b];
