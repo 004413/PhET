@@ -50,16 +50,14 @@ var MATERIAL_IOR_TAG = "Index of Refraction: ";
 var RESET_BUTTON_TEXT = "Reset All";
 
 /* Makes a Raphael path for a line from a list of two (X,Y) coordinates */
-function makePathForLine(listOfCoordinates){
-  var loC = listOfCoordinates;
+function makePathForLine(loC){ // loC is a list of coordinates
   return "m"+loC[0][0]+","+loC[0][1]+"L"+loC[1][0]+","+loC[1][1];
 }
 
 /* Makes a Raphael path for a polygon from a list of (X,Y) coordinates */
-function makePathForPolygon(listOfCoordinates){
-  var loC = listOfCoordinates;
+function makePathForPolygon(loC){ // loC is a list of coordinates
   var outStr = "m"+loC[0][0]+","+loC[0][1]+"L"; // syntax for first point
-  for(var p=1;p<listOfCoordinates.length;p+=1){
+  for(var p=1;p<loC.length;p+=1){
     outStr += loC[p][0]+","+loC[p][1]+","; // syntax for additional points
   }
   outStr = outStr.substring(0,outStr.length-1);
