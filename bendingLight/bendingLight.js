@@ -5,20 +5,30 @@ var PI = Math.PI;
 var AIR_INDEX = 1;
 var WATER_INDEX = 1.33;
 var GLASS_INDEX = 1.5;
-var MATERIAL1_DEFAULT = "Air";
-var MATERIAL2_DEFAULT = "Water";
-/* should be rewritten in terms of above constants */
-var INDEX1_DEFAULT = AIR_INDEX;
-var INDEX2_DEFAULT = WATER_INDEX;
-var DEFAULT_ANGLE = PI/4;
-var NORMAL_SHOWN_DEFAULT = true;
+
+/* Standard graphical constants */
 var STANDARD_MARGIN = 8;
 var STANDARD_TEXT_MARGIN = 12;
 var STANDARD_ROUNDING_RADIUS = 6;
 var STANDARD_BEAM_WIDTH = 4;
 
+/* Defaults */
+var INDICES = {'Air':AIR_INDEX,'Water':WATER_INDEX,'Glass':GLASS_INDEX};
+var MATERIAL1_DEFAULT = "Air";
+var MATERIAL2_DEFAULT = "Water";
+var INDEX1_DEFAULT = INDICES[MATERIAL1_DEFAULT];
+var INDEX2_DEFAULT = INDICES[MATERIAL2_DEFAULT];
+var DEFAULT_ANGLE = PI/4;
+var NORMAL_SHOWN_DEFAULT = true;
+
 /* Global variables */
-buttonPressed = true;
+buttonPressed = false;
+material1 = MATERIAL1_DEFAULT;
+material2 = MATERIAL2_DEFAULT;
+index1 = INDEX1_DEFAULT;
+index2 = INDEX2_DEFAULT;
+angle = DEFAULT_ANGLE;
+normalShown = NORMAL_SHOWN_DEFAULT;
 
 /* Color constants */
 var UPPER_RECT_COLOR = '#E0E0FF';
@@ -57,45 +67,50 @@ function makePathForPolygon(listOfCoordinates){
   return outStr;
 }
 
-/* Graphic constants and entities */
+/* Graphical constants and entities */
 /* Simulation Window */
-var SIM_WIDTH = 1000;
+var SIM_WIDTH = 1000; 
 var SIM_HEIGHT = 600;
+var WH_MIN = Math.min(SIM_WIDTH,SIM_HEIGHT); // Minimum of simulation window width and height
 canvas = Raphael(0,0,SIM_WIDTH,SIM_HEIGHT);
-var upperRect = canvas.rect(0,0,SIM_WIDTH,SIM_HEIGHT/2)
+var UPPER_RECT = canvas.rect(0,0,SIM_WIDTH,SIM_HEIGHT/2)
                       .attr({'fill':UPPER_RECT_COLOR});
-var lowerRect = canvas.rect(0,SIM_HEIGHT/2,SIM_WIDTH,SIM_HEIGHT/2)
+var LOWER_RECT = canvas.rect(0,SIM_HEIGHT/2,SIM_WIDTH,SIM_HEIGHT/2)
                       .attr({'fill':LOWER_RECT_COLOR});
-var BEAM_CONTACT_POINT_X = 350;
+var BEAM_CONTACT_POINT_X = Math.min(350,SIM_WIDTH/2);
 var BEAM_CONTACT_POINT_Y = SIM_HEIGHT/2;
 var BEAM_CONTACT_POINT = [BEAM_CONTACT_POINT_X , BEAM_CONTACT_POINT_Y];
 
 /* Emitter (not necessarily constants) */
-var EMITTER_CONTACT_DISTANCE = 175*Math.sqrt(2);
-var EMITTER_CONTACT_X_DIFF = EMITTER_CONTACT_DISTANCE * Math.sin(DEFAULT_ANGLE);
-var EMITTER_CONTACT_Y_DIFF = EMITTER_CONTACT_DISTANCE * Math.cos(DEFAULT_ANGLE);
-var EMITTER_CENTER_X = BEAM_CONTACT_POINT_X - EMITTER_CONTACT_X_DIFF;
-var EMITTER_CENTER_Y = BEAM_CONTACT_POINT_Y - EMITTER_CONTACT_Y_DIFF;
-var EMITTER_LENGTH = 63;
-var EMITTER_WIDTH = 21;
-var EMITTER_LEFT_X = EMITTER_CENTER_X - EMITTER_LENGTH*Math.sin(DEFAULT_ANGLE) - EMITTER_WIDTH*Math.cos(DEFAULT_ANGLE);
-var EMITTER_LEFT_Y = EMITTER_CENTER_Y - EMITTER_LENGTH*Math.cos(DEFAULT_ANGLE) + EMITTER_WIDTH*Math.sin(DEFAULT_ANGLE);
-var EMITTER_LEFT = [EMITTER_LEFT_X , EMITTER_LEFT_Y];
-var EMITTER_TOP_X = EMITTER_CENTER_X - EMITTER_LENGTH*Math.sin(DEFAULT_ANGLE) + EMITTER_WIDTH*Math.cos(DEFAULT_ANGLE);
-var EMITTER_TOP_Y = EMITTER_CENTER_Y - EMITTER_LENGTH*Math.cos(DEFAULT_ANGLE) - EMITTER_WIDTH*Math.sin(DEFAULT_ANGLE);
-var EMITTER_TOP = [EMITTER_TOP_X , EMITTER_TOP_Y];
-var EMITTER_RIGHT_X = EMITTER_CENTER_X + EMITTER_LENGTH*Math.sin(DEFAULT_ANGLE) + EMITTER_WIDTH*Math.cos(DEFAULT_ANGLE);
-var EMITTER_RIGHT_Y = EMITTER_CENTER_Y + EMITTER_LENGTH*Math.cos(DEFAULT_ANGLE) - EMITTER_WIDTH*Math.sin(DEFAULT_ANGLE);
-var EMITTER_RIGHT = [EMITTER_RIGHT_X , EMITTER_RIGHT_Y];
-var EMITTER_BOTTOM_X = EMITTER_CENTER_X + EMITTER_LENGTH*Math.sin(DEFAULT_ANGLE) - EMITTER_WIDTH*Math.cos(DEFAULT_ANGLE);
-var EMITTER_BOTTOM_Y = EMITTER_CENTER_Y + EMITTER_LENGTH*Math.cos(DEFAULT_ANGLE) + EMITTER_WIDTH*Math.sin(DEFAULT_ANGLE);
-var EMITTER_BOTTOM = [EMITTER_BOTTOM_X , EMITTER_BOTTOM_Y];
-emitter = canvas.path(makePathForPolygon([EMITTER_LEFT,EMITTER_TOP,EMITTER_RIGHT,EMITTER_BOTTOM]))
+var EMITTER_CONTACT_DISTANCE = Math.min(175*Math.sqrt(2),WH_MIN/3);
+var emitter_contact_x_diff = EMITTER_CONTACT_DISTANCE * Math.sin(angle);
+var emitter_contact_y_diff = EMITTER_CONTACT_DISTANCE * Math.cos(angle);
+var emitter_center_x = BEAM_CONTACT_POINT_X - emitter_contact_x_diff;
+var emitter_center_y = BEAM_CONTACT_POINT_Y - emitter_contact_y_diff;
+var EMITTER_LENGTH = Math.min(126,WH_MIN/4);
+var EMITTER_WIDTH = EMITTER_LENGTH/3;
+var EMITTER_LENGTH_HALF = EMITTER_LENGTH/2;
+var EMITTER_WIDTH_HALF = EMITTER_WIDTH/2;
+var emitter_left_x = emitter_center_x - EMITTER_LENGTH_HALF*Math.sin(angle) - EMITTER_WIDTH_HALF*Math.cos(angle);
+var emitter_left_y = emitter_center_y - EMITTER_LENGTH_HALF*Math.cos(angle) + EMITTER_WIDTH_HALF*Math.sin(angle);
+var emitter_left = [emitter_left_x , emitter_left_y];
+var emitter_top_x = emitter_center_x - EMITTER_LENGTH_HALF*Math.sin(angle) + EMITTER_WIDTH_HALF*Math.cos(angle);
+var emitter_top_y = emitter_center_y - EMITTER_LENGTH_HALF*Math.cos(angle) - EMITTER_WIDTH_HALF*Math.sin(angle);
+var emitter_top = [emitter_top_x , emitter_top_y];
+var emitter_right_x = emitter_center_x + EMITTER_LENGTH_HALF*Math.sin(angle) + EMITTER_WIDTH_HALF*Math.cos(angle);
+var emitter_right_y = emitter_center_y + EMITTER_LENGTH_HALF*Math.cos(angle) - EMITTER_WIDTH_HALF*Math.sin(angle);
+var emitter_right = [emitter_right_x , emitter_right_y];
+var emitter_bottom_x = emitter_center_x + EMITTER_LENGTH_HALF*Math.sin(angle) - EMITTER_WIDTH_HALF*Math.cos(angle);
+var emitter_bottom_y = emitter_center_y + EMITTER_LENGTH_HALF*Math.cos(angle) + EMITTER_WIDTH_HALF*Math.sin(angle);
+var emitter_bottom = [emitter_bottom_x , emitter_bottom_y];
+emitter = canvas.path(makePathForPolygon([emitter_left,emitter_top,emitter_right,emitter_bottom]))
                 .attr({'fill':EMITTER_COLOR})
                 .attr({'id':'emitter'});
-var BUTTON_RADIUS = 16;
-emitterButton = canvas.circle(EMITTER_CENTER_X,EMITTER_CENTER_Y,BUTTON_RADIUS)
-                      .attr({'fill':BUTTON_COLOR_UNPRESSED});
+var BUTTON_MARGIN = 5;
+var BUTTON_RADIUS = Math.max(1,EMITTER_WIDTH/2-BUTTON_MARGIN);
+emitterButton = canvas.circle(emitter_center_x,emitter_center_y,BUTTON_RADIUS)
+                      .attr({'fill':BUTTON_COLOR_UNPRESSED})
+                      .attr({'id':'emitterButton'});
 
 /* Laser View Box */
 var LASER_VIEW_TL_X = STANDARD_MARGIN; // TL: top-left
@@ -103,13 +118,14 @@ var LASER_VIEW_TL_Y = STANDARD_MARGIN;
 var LASER_VIEW_BOX_WIDTH = 100;
 var LASER_VIEW_BOX_HEIGHT = 80;
 laserViewBox = canvas.rect(LASER_VIEW_TL_X,LASER_VIEW_TL_Y,LASER_VIEW_BOX_WIDTH,LASER_VIEW_BOX_HEIGHT,STANDARD_ROUNDING_RADIUS)
-                         .attr({'fill':LASER_VIEW_BOX_COLOR});
+                         .attr({'fill':LASER_VIEW_BOX_COLOR})
+                         .attr({'id':'laserViewBox'});
 
 /* Material Adjustment Boxen */
-var MATERIAL_BOX_WIDTH = 240; // Shared attributes between material boxes
-var MATERIAL_BOX_HEIGHT = 160;
+var MATERIAL_BOX_WIDTH = Math.min(240,SIM_WIDTH/4); // Shared attributes between material boxes
+var MATERIAL_BOX_HEIGHT = 2*MATERIAL_BOX_WIDTH/3;
 var MATERIAL_BOX_VERTICAL_OFFSET = STANDARD_MARGIN + MATERIAL_BOX_HEIGHT/2; // offset to center
-var MATERIAL_BOX_CENTER_X = SIM_WIDTH-150;
+var MATERIAL_BOX_CENTER_X = SIM_WIDTH-150; // Calculate and adjust later to fit with above
 var UPPER_MATERIAL_BOX_CENTER_Y = SIM_HEIGHT/2 - MATERIAL_BOX_VERTICAL_OFFSET;
 var LOWER_MATERIAL_BOX_CENTER_Y = SIM_HEIGHT/2 + MATERIAL_BOX_VERTICAL_OFFSET;
 var MATERIAL_BOX_TL_X = MATERIAL_BOX_CENTER_X - MATERIAL_BOX_WIDTH/2;
@@ -119,46 +135,56 @@ upperMaterialViewBox = canvas.rect(MATERIAL_BOX_TL_X,UPPER_MATERIAL_BOX_TL_Y,MAT
 lowerMaterialViewBox = canvas.rect(MATERIAL_BOX_TL_X,LOWER_MATERIAL_BOX_TL_Y,MATERIAL_BOX_WIDTH,MATERIAL_BOX_HEIGHT,STANDARD_ROUNDING_RADIUS).attr({'fill':MATERIAL_BOX_COLOR});
 
 /* Reset Button */
-var RESET_BUTTON_WIDTH = 100;
-var RESET_BUTTON_HEIGHT = 30;
+var RESET_BUTTON_WIDTH = Math.min(100,SIM_WIDTH/5);
+var RESET_BUTTON_HEIGHT = Math.min(30,SIM_HEIGHT/5);
 var RESET_BUTTON_TL_X = SIM_WIDTH-130;
-var RESET_BUTTON_VERTICAL_OFFSET = STANDARD_MARGIN + RESET_BUTTON_HEIGHT; // offset to top
+var RESET_BUTTON_VERTICAL_OFFSET = STANDARD_MARGIN + RESET_BUTTON_HEIGHT; // offset from screen bottom to top
 var RESET_BUTTON_TL_Y = SIM_HEIGHT - RESET_BUTTON_VERTICAL_OFFSET;
-resetButton = canvas.rect(RESET_BUTTON_TL_X,RESET_BUTTON_TL_Y,RESET_BUTTON_WIDTH,RESET_BUTTON_HEIGHT,STANDARD_ROUNDING_RADIUS).attr({'fill':RESET_BUTTON_COLOR}).addClass('resetButton');
+resetButton = canvas.rect(RESET_BUTTON_TL_X,RESET_BUTTON_TL_Y,RESET_BUTTON_WIDTH,RESET_BUTTON_HEIGHT,STANDARD_ROUNDING_RADIUS).attr({'fill':RESET_BUTTON_COLOR});
+
+/* Normal Line */
+var NORMAL_LINE_LENGTH = Math.min(300,SIM_HEIGHT/2);
+var NORMAL_LINE_TOP = [BEAM_CONTACT_POINT_X , BEAM_CONTACT_POINT_Y - NORMAL_LINE_LENGTH/2];
+var NORMAL_LINE_BOTTOM = [BEAM_CONTACT_POINT_X , BEAM_CONTACT_POINT_Y + NORMAL_LINE_LENGTH/2];
+normalLine = canvas.path(makePathForLine([NORMAL_LINE_TOP , NORMAL_LINE_BOTTOM]))
+                   .attr({'stroke-dasharray':'--'})
+                   .attr({'id':'normalLine'});
 
 /* Initial Beam (not necessarily constants) */
-var EMITTER_CENTER_TO_EMISSION = 45*Math.sqrt(2); // should be redefined in terms of previous constants
 // BR: bottom-right
-var EMITTER_BR_X = EMITTER_CENTER_X + EMITTER_CENTER_TO_EMISSION * Math.sin(DEFAULT_ANGLE);
-var EMITTER_BR_Y = EMITTER_CENTER_Y + EMITTER_CENTER_TO_EMISSION * Math.cos(DEFAULT_ANGLE);
-var EMITTER_BR = [EMITTER_BR_X , EMITTER_BR_Y]
-initBeam = canvas.path(makePathForLine([EMITTER_BR , BEAM_CONTACT_POINT]))
+var emitter_br_x = emitter_center_x + EMITTER_LENGTH_HALF * Math.sin(angle);
+var emitter_br_y = emitter_center_y + EMITTER_LENGTH_HALF * Math.cos(angle);
+var emitter_br = [emitter_br_x , emitter_br_y]
+initBeam = canvas.path(makePathForLine([emitter_br , BEAM_CONTACT_POINT]))
                  .attr({'stroke':FULL_BEAM_COLOR})
-                 .attr({'stroke-width':STANDARD_BEAM_WIDTH});
+                 .attr({'stroke-width':STANDARD_BEAM_WIDTH})
+                 .attr({'id':'initBeam'});
 
 /* Reflected Beam (not necessarily constants) */
-// UR: upper-right
-var UR_X = Math.tan(DEFAULT_ANGLE)*SIM_HEIGHT/2+BEAM_CONTACT_POINT_X;
-var UR_Y = 0;
-var UR = [UR_X , UR_Y];
-reflBeam = canvas.path(makePathForLine([UR , BEAM_CONTACT_POINT]))
+// ur: upper-right
+var ur_x = Math.tan(angle)*SIM_HEIGHT/2+BEAM_CONTACT_POINT_X;
+var ur_y = 0;
+var ur = [ur_x , ur_y];
+reflBeam = canvas.path(makePathForLine([ur , BEAM_CONTACT_POINT]))
                  .attr({'stroke':FULL_BEAM_COLOR})
-                 .attr({'stroke-width':STANDARD_BEAM_WIDTH});
+                 .attr({'stroke-width':STANDARD_BEAM_WIDTH})
+                 .attr({'id':'reflBeam'});
 
 /* Propagating Beam (not necessarily constants) */
-var newAngle = getNewAngleRefraction(INDEX1_DEFAULT,DEFAULT_ANGLE,INDEX2_DEFAULT);
+var newAngle = getNewAngleRefraction(index1,angle,index2);
 // LR: lower-right
 var PROP_LR_X = Math.tan(newAngle)*SIM_HEIGHT/2+BEAM_CONTACT_POINT_X;
 var PROP_LR_Y = SIM_HEIGHT;
 var PROP_LR = [PROP_LR_X , PROP_LR_Y]
 propBeam = canvas.path(makePathForLine([PROP_LR , BEAM_CONTACT_POINT]))
                  .attr({'stroke':FULL_BEAM_COLOR})
-                 .attr({'stroke-width':STANDARD_BEAM_WIDTH});
+                 .attr({'stroke-width':STANDARD_BEAM_WIDTH})
+                 .attr({'id':'propBeam'});
 
 canvas.text(LASER_VIEW_TL_X+LASER_VIEW_BOX_WIDTH/2,LASER_VIEW_TL_Y+STANDARD_TEXT_MARGIN,LASER_VIEW_TITLE_TEXT);
 canvas.text(MATERIAL_BOX_TL_X+MATERIAL_BOX_WIDTH/2,UPPER_MATERIAL_BOX_TL_Y+STANDARD_TEXT_MARGIN,MATERIAL_TAG);
 canvas.text(MATERIAL_BOX_TL_X+MATERIAL_BOX_WIDTH/2,LOWER_MATERIAL_BOX_TL_Y+STANDARD_TEXT_MARGIN,MATERIAL_TAG);
-canvas.text(RESET_BUTTON_TL_X+RESET_BUTTON_WIDTH/2,RESET_BUTTON_TL_Y+STANDARD_TEXT_MARGIN,RESET_BUTTON_TEXT).addClass('resetButton');
+canvas.text(RESET_BUTTON_TL_X+RESET_BUTTON_WIDTH/2,RESET_BUTTON_TL_Y+STANDARD_TEXT_MARGIN,RESET_BUTTON_TEXT);
 
 /* Angles are with respect to the normal. */
 
@@ -185,3 +211,10 @@ function calcReflected(n1,th1,n2,th2){
 function calcTransmitted(n1,th1,n2,th2){
   return 4*n1*n2*Math.cos(th1)*Math.cos(th2)/Math.pow(n1*Math.cos(th2)+n2*Math.cos(th1),2);
 }
+
+$(document).ready(function(){
+  console.log($('#emitterButton').attr('fill'));
+  $('#emitterButton').click(function(){
+    $(this).attr({'fill':BUTTON_COLOR_PRESSED});
+  });
+});
