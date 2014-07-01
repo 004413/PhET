@@ -6,12 +6,6 @@ var AIR_INDEX = 1;
 var WATER_INDEX = 1.33;
 var GLASS_INDEX = 1.5;
 
-/* Standard graphical constants */
-var STANDARD_MARGIN = 8;
-var STANDARD_TEXT_MARGIN = 12;
-var STANDARD_ROUNDING_RADIUS = 6;
-var STANDARD_BEAM_WIDTH = 4;
-
 /* Defaults */
 var INDICES = {'Air':AIR_INDEX,'Water':WATER_INDEX,'Glass':GLASS_INDEX};
 var MATERIAL1_DEFAULT = "Air";
@@ -20,15 +14,6 @@ var INDEX1_DEFAULT = INDICES[MATERIAL1_DEFAULT];
 var INDEX2_DEFAULT = INDICES[MATERIAL2_DEFAULT];
 var DEFAULT_ANGLE = PI/4;
 var NORMAL_SHOWN_DEFAULT = true;
-
-/* Global variables */
-buttonPressed = false;
-material1 = MATERIAL1_DEFAULT;
-material2 = MATERIAL2_DEFAULT;
-index1 = INDEX1_DEFAULT;
-index2 = INDEX2_DEFAULT;
-angle = DEFAULT_ANGLE;
-normalShown = NORMAL_SHOWN_DEFAULT;
 
 /* Color constants */
 var UPPER_RECT_COLOR = '#E0E0FF';
@@ -40,6 +25,35 @@ var LASER_VIEW_BOX_COLOR = '#E0E0E0';
 var MATERIAL_BOX_COLOR = LASER_VIEW_BOX_COLOR;
 var RESET_BUTTON_COLOR = '#E0E000';
 var FULL_BEAM_COLOR = "#FF0000";
+
+/* Simulation Setup */
+var SIM_WIDTH = 900; 
+var SIM_HEIGHT = 450;
+var WH_MIN = Math.min(SIM_WIDTH,SIM_HEIGHT); // Minimum of simulation window width and height
+canvas = Raphael(0,0,SIM_WIDTH,SIM_HEIGHT);
+var UPPER_RECT = canvas.rect(0,0,SIM_WIDTH,SIM_HEIGHT/2)
+                      .attr({'fill':UPPER_RECT_COLOR});
+var LOWER_RECT = canvas.rect(0,SIM_HEIGHT/2,SIM_WIDTH,SIM_HEIGHT/2)
+                      .attr({'fill':LOWER_RECT_COLOR});
+
+/* Standard graphical constants */
+var STANDARD_MARGIN = Math.min(8,WH_MIN/8);
+var STANDARD_TEXT_MARGIN = Math.min(12,WH_MIN/12);
+var STANDARD_ROUNDING_RADIUS = Math.min(6,WH_MIN/20);
+var STANDARD_BEAM_WIDTH = Math.min(4,WH_MIN/24);
+
+var SLIDER_HEIGHT = Math.min(50,SIM_WIDTH/10);
+var SLIDER_WIDTH = Math.min(300,SIM_WIDTH/2);
+var angleSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT,SLIDER_WIDTH,SLIDER_HEIGHT,0,PI/2,"Angle");
+
+/* Global variables */
+buttonPressed = false;
+material1 = MATERIAL1_DEFAULT;
+material2 = MATERIAL2_DEFAULT;
+index1 = INDEX1_DEFAULT;
+index2 = INDEX2_DEFAULT;
+angle = PI/4;
+normalShown = NORMAL_SHOWN_DEFAULT;
 
 /* Text constants */
 var LASER_VIEW_TITLE_TEXT = "Laser View";
@@ -66,16 +80,7 @@ function makePathForPolygon(loC){ // loC is a list of coordinates
 }
 
 /* Graphical constants and entities */
-/* Simulation Window */
-var SIM_WIDTH = 1000; 
-var SIM_HEIGHT = 600;
-var WH_MIN = Math.min(SIM_WIDTH,SIM_HEIGHT); // Minimum of simulation window width and height
-canvas = Raphael(0,0,SIM_WIDTH,SIM_HEIGHT);
-var UPPER_RECT = canvas.rect(0,0,SIM_WIDTH,SIM_HEIGHT/2)
-                      .attr({'fill':UPPER_RECT_COLOR});
-var LOWER_RECT = canvas.rect(0,SIM_HEIGHT/2,SIM_WIDTH,SIM_HEIGHT/2)
-                      .attr({'fill':LOWER_RECT_COLOR});
-var BEAM_CONTACT_POINT_X = Math.min(350,SIM_WIDTH/2);
+var BEAM_CONTACT_POINT_X = Math.min(350,2*SIM_WIDTH/5);
 var BEAM_CONTACT_POINT_Y = SIM_HEIGHT/2;
 var BEAM_CONTACT_POINT = [BEAM_CONTACT_POINT_X , BEAM_CONTACT_POINT_Y];
 
@@ -113,17 +118,17 @@ emitterButton = canvas.circle(emitter_center_x,emitter_center_y,BUTTON_RADIUS)
 /* Laser View Box */
 var LASER_VIEW_TL_X = STANDARD_MARGIN; // TL: top-left
 var LASER_VIEW_TL_Y = STANDARD_MARGIN;
-var LASER_VIEW_BOX_WIDTH = 100;
-var LASER_VIEW_BOX_HEIGHT = 80;
+var LASER_VIEW_BOX_WIDTH = Math.min(100,SIM_WIDTH/5);
+var LASER_VIEW_BOX_HEIGHT = 4*LASER_VIEW_BOX_WIDTH/5;
 laserViewBox = canvas.rect(LASER_VIEW_TL_X,LASER_VIEW_TL_Y,LASER_VIEW_BOX_WIDTH,LASER_VIEW_BOX_HEIGHT,STANDARD_ROUNDING_RADIUS)
                          .attr({'fill':LASER_VIEW_BOX_COLOR})
                          .attr({'id':'laserViewBox'});
 
 /* Material Adjustment Boxen */
-var MATERIAL_BOX_WIDTH = Math.min(240,SIM_WIDTH/4); // Shared attributes between material boxes
+var MATERIAL_BOX_WIDTH = Math.min(200,SIM_WIDTH/5); // Shared attributes between material boxes
 var MATERIAL_BOX_HEIGHT = 2*MATERIAL_BOX_WIDTH/3;
 var MATERIAL_BOX_VERTICAL_OFFSET = STANDARD_MARGIN + MATERIAL_BOX_HEIGHT/2; // offset to center
-var MATERIAL_BOX_CENTER_X = SIM_WIDTH-150; // Calculate and adjust later to fit with above
+var MATERIAL_BOX_CENTER_X = 7*SIM_WIDTH/8-10; // Calculate and adjust later to fit with above
 var UPPER_MATERIAL_BOX_CENTER_Y = SIM_HEIGHT/2 - MATERIAL_BOX_VERTICAL_OFFSET;
 var LOWER_MATERIAL_BOX_CENTER_Y = SIM_HEIGHT/2 + MATERIAL_BOX_VERTICAL_OFFSET;
 var MATERIAL_BOX_TL_X = MATERIAL_BOX_CENTER_X - MATERIAL_BOX_WIDTH/2;
@@ -133,9 +138,9 @@ upperMaterialViewBox = canvas.rect(MATERIAL_BOX_TL_X,UPPER_MATERIAL_BOX_TL_Y,MAT
 lowerMaterialViewBox = canvas.rect(MATERIAL_BOX_TL_X,LOWER_MATERIAL_BOX_TL_Y,MATERIAL_BOX_WIDTH,MATERIAL_BOX_HEIGHT,STANDARD_ROUNDING_RADIUS).attr({'fill':MATERIAL_BOX_COLOR});
 
 /* Reset Button */
-var RESET_BUTTON_WIDTH = Math.min(100,SIM_WIDTH/5);
-var RESET_BUTTON_HEIGHT = Math.min(30,SIM_HEIGHT/5);
-var RESET_BUTTON_TL_X = SIM_WIDTH-130;
+var RESET_BUTTON_WIDTH = Math.min(100,SIM_WIDTH/8);
+var RESET_BUTTON_HEIGHT = Math.min(30,SIM_HEIGHT/12);
+var RESET_BUTTON_TL_X = 7*SIM_WIDTH/8-20;
 var RESET_BUTTON_VERTICAL_OFFSET = STANDARD_MARGIN + RESET_BUTTON_HEIGHT; // offset from screen bottom to top
 var RESET_BUTTON_TL_Y = SIM_HEIGHT - RESET_BUTTON_VERTICAL_OFFSET;
 resetButton = canvas.rect(RESET_BUTTON_TL_X,RESET_BUTTON_TL_Y,RESET_BUTTON_WIDTH,RESET_BUTTON_HEIGHT,STANDARD_ROUNDING_RADIUS).attr({'fill':RESET_BUTTON_COLOR});
@@ -210,9 +215,20 @@ function calcTransmitted(n1,th1,n2,th2){
   return 4*n1*n2*Math.cos(th1)*Math.cos(th2)/Math.pow(n1*Math.cos(th2)+n2*Math.cos(th1),2);
 }
 
+/* Not working for some reason 
 $(document).ready(function(){
-  console.log($('#emitterButton').attr('fill'));
   $('#emitterButton').click(function(){
-    $(this).attr({'fill':BUTTON_COLOR_PRESSED});
+    console.log(canvas.getByID('emitterButton'));
+    canvas.getById('emitterButton')
+          .attr({'fill':BUTTON_COLOR_PRESSED});
   });
 });
+*/
+
+function updateAngle(){
+  console.log("Got here!");
+  angle = angleSlider.val;
+  console.log(angle);
+}
+
+setInterval(updateAngle(),10);
