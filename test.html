@@ -2,13 +2,16 @@
 <body>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.2/raphael-min.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-	<link rel="sylesheet" href="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.2/jquery.min.css" />
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.2/jquery.min.css" />
 	<script src="PhETlib.js"></script>
 	<script src="PhETlib_linegraph.js"></script>
 	<script>
 		var canvas = Raphael(0,0,1000,1000);
 		//var sliderA = new slider(canvas,500,50,400,50,-10,10,'Slope');
 		//var sliderB = new slider(canvas,500,150,400,50,-10,10,'Y-Int.');
+		var sliders = canvas.set();
+		var sliderA = new slider(canvas,500,50,400,50,-10,10,'Slope');
+		var sliderB = new slider(canvas,500,150,400,50,-20,20,'Y-Int.');
 		
 		//drawLine(sliderA.val,sliderB.val); //initial graph
 	</script>
