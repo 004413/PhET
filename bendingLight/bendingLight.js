@@ -12,7 +12,7 @@ var MATERIAL1_DEFAULT = "Air";
 var MATERIAL2_DEFAULT = "Water";
 var INDEX1_DEFAULT = INDICES[MATERIAL1_DEFAULT];
 var INDEX2_DEFAULT = INDICES[MATERIAL2_DEFAULT];
-var DEFAULT_ANGLE = PI/4;
+var DEFAULT_ANGLE = 0;
 var NORMAL_SHOWN_DEFAULT = true;
 
 /* Color constants */
@@ -86,26 +86,26 @@ var BEAM_CONTACT_POINT = [BEAM_CONTACT_POINT_X , BEAM_CONTACT_POINT_Y];
 
 /* Emitter (not necessarily constants) */
 var EMITTER_CONTACT_DISTANCE = Math.min(175*Math.sqrt(2),WH_MIN/3);
-var emitter_contact_x_diff = EMITTER_CONTACT_DISTANCE * Math.sin(angle);
-var emitter_contact_y_diff = EMITTER_CONTACT_DISTANCE * Math.cos(angle);
-var emitter_center_x = BEAM_CONTACT_POINT_X - emitter_contact_x_diff;
-var emitter_center_y = BEAM_CONTACT_POINT_Y - emitter_contact_y_diff;
+emitter_contact_x_diff = EMITTER_CONTACT_DISTANCE * Math.sin(angle);
+emitter_contact_y_diff = EMITTER_CONTACT_DISTANCE * Math.cos(angle);
+emitter_center_x = BEAM_CONTACT_POINT_X - emitter_contact_x_diff;
+emitter_center_y = BEAM_CONTACT_POINT_Y - emitter_contact_y_diff;
 var EMITTER_LENGTH = Math.min(126,WH_MIN/4);
 var EMITTER_WIDTH = EMITTER_LENGTH/3;
 var EMITTER_LENGTH_HALF = EMITTER_LENGTH/2;
 var EMITTER_WIDTH_HALF = EMITTER_WIDTH/2;
-var emitter_left_x = emitter_center_x - EMITTER_LENGTH_HALF*Math.sin(angle) - EMITTER_WIDTH_HALF*Math.cos(angle);
-var emitter_left_y = emitter_center_y - EMITTER_LENGTH_HALF*Math.cos(angle) + EMITTER_WIDTH_HALF*Math.sin(angle);
-var emitter_left = [emitter_left_x , emitter_left_y];
-var emitter_top_x = emitter_center_x - EMITTER_LENGTH_HALF*Math.sin(angle) + EMITTER_WIDTH_HALF*Math.cos(angle);
-var emitter_top_y = emitter_center_y - EMITTER_LENGTH_HALF*Math.cos(angle) - EMITTER_WIDTH_HALF*Math.sin(angle);
-var emitter_top = [emitter_top_x , emitter_top_y];
-var emitter_right_x = emitter_center_x + EMITTER_LENGTH_HALF*Math.sin(angle) + EMITTER_WIDTH_HALF*Math.cos(angle);
-var emitter_right_y = emitter_center_y + EMITTER_LENGTH_HALF*Math.cos(angle) - EMITTER_WIDTH_HALF*Math.sin(angle);
-var emitter_right = [emitter_right_x , emitter_right_y];
-var emitter_bottom_x = emitter_center_x + EMITTER_LENGTH_HALF*Math.sin(angle) - EMITTER_WIDTH_HALF*Math.cos(angle);
-var emitter_bottom_y = emitter_center_y + EMITTER_LENGTH_HALF*Math.cos(angle) + EMITTER_WIDTH_HALF*Math.sin(angle);
-var emitter_bottom = [emitter_bottom_x , emitter_bottom_y];
+emitter_left_x = emitter_center_x - EMITTER_LENGTH_HALF*Math.sin(angle) - EMITTER_WIDTH_HALF*Math.cos(angle);
+emitter_left_y = emitter_center_y - EMITTER_LENGTH_HALF*Math.cos(angle) + EMITTER_WIDTH_HALF*Math.sin(angle);
+emitter_left = [emitter_left_x , emitter_left_y];
+emitter_top_x = emitter_center_x - EMITTER_LENGTH_HALF*Math.sin(angle) + EMITTER_WIDTH_HALF*Math.cos(angle);
+emitter_top_y = emitter_center_y - EMITTER_LENGTH_HALF*Math.cos(angle) - EMITTER_WIDTH_HALF*Math.sin(angle);
+emitter_top = [emitter_top_x , emitter_top_y];
+emitter_right_x = emitter_center_x + EMITTER_LENGTH_HALF*Math.sin(angle) + EMITTER_WIDTH_HALF*Math.cos(angle);
+emitter_right_y = emitter_center_y + EMITTER_LENGTH_HALF*Math.cos(angle) - EMITTER_WIDTH_HALF*Math.sin(angle);
+emitter_right = [emitter_right_x , emitter_right_y];
+emitter_bottom_x = emitter_center_x + EMITTER_LENGTH_HALF*Math.sin(angle) - EMITTER_WIDTH_HALF*Math.cos(angle);
+emitter_bottom_y = emitter_center_y + EMITTER_LENGTH_HALF*Math.cos(angle) + EMITTER_WIDTH_HALF*Math.sin(angle);
+emitter_bottom = [emitter_bottom_x , emitter_bottom_y];
 emitter = canvas.path(makePathForPolygon([emitter_left,emitter_top,emitter_right,emitter_bottom]))
                 .attr({'fill':EMITTER_COLOR})
                 .attr({'id':'emitter'});
@@ -155,9 +155,9 @@ normalLine = canvas.path(makePathForLine([NORMAL_LINE_TOP , NORMAL_LINE_BOTTOM])
 
 /* Initial Beam (not necessarily constants) */
 // BR: bottom-right
-var emitter_br_x = emitter_center_x + EMITTER_LENGTH_HALF * Math.sin(angle);
-var emitter_br_y = emitter_center_y + EMITTER_LENGTH_HALF * Math.cos(angle);
-var emitter_br = [emitter_br_x , emitter_br_y]
+emitter_br_x = emitter_center_x + EMITTER_LENGTH_HALF * Math.sin(angle);
+emitter_br_y = emitter_center_y + EMITTER_LENGTH_HALF * Math.cos(angle);
+emitter_br = [emitter_br_x , emitter_br_y]
 initBeam = canvas.path(makePathForLine([emitter_br , BEAM_CONTACT_POINT]))
                  .attr({'stroke':FULL_BEAM_COLOR})
                  .attr({'stroke-width':STANDARD_BEAM_WIDTH})
@@ -165,16 +165,16 @@ initBeam = canvas.path(makePathForLine([emitter_br , BEAM_CONTACT_POINT]))
 
 /* Reflected Beam (not necessarily constants) */
 // ur: upper-right
-var ur_x = Math.tan(angle)*SIM_HEIGHT/2+BEAM_CONTACT_POINT_X;
-var ur_y = 0;
-var ur = [ur_x , ur_y];
+ur_x = Math.tan(angle)*SIM_HEIGHT/2+BEAM_CONTACT_POINT_X;
+ur_y = 0;
+ur = [ur_x , ur_y];
 reflBeam = canvas.path(makePathForLine([ur , BEAM_CONTACT_POINT]))
                  .attr({'stroke':FULL_BEAM_COLOR})
                  .attr({'stroke-width':STANDARD_BEAM_WIDTH})
                  .attr({'id':'reflBeam'});
 
 /* Propagating Beam (not necessarily constants) */
-var newAngle = getNewAngleRefraction(index1,angle,index2);
+newAngle = getNewAngleRefraction(index1,angle,index2);
 // LR: lower-right
 var PROP_LR_X = Math.tan(newAngle)*SIM_HEIGHT/2+BEAM_CONTACT_POINT_X;
 var PROP_LR_Y = SIM_HEIGHT;
@@ -226,9 +226,56 @@ $(document).ready(function(){
 */
 
 function updateAngle(){
-  console.log("Got here!");
   angle = angleSlider.val;
-  console.log(angle);
+  emitter_contact_x_diff = EMITTER_CONTACT_DISTANCE * Math.sin(angle);
+  emitter_contact_y_diff = EMITTER_CONTACT_DISTANCE * Math.cos(angle);
+  emitter_center_x = BEAM_CONTACT_POINT_X - emitter_contact_x_diff;
+  emitter_center_y = BEAM_CONTACT_POINT_Y - emitter_contact_y_diff;
+  emitter_left_x = emitter_center_x - EMITTER_LENGTH_HALF*Math.sin(angle) - EMITTER_WIDTH_HALF*Math.cos(angle);
+  emitter_left_y = emitter_center_y - EMITTER_LENGTH_HALF*Math.cos(angle) + EMITTER_WIDTH_HALF*Math.sin(angle);
+  emitter_left = [emitter_left_x , emitter_left_y];
+  emitter_top_x = emitter_center_x - EMITTER_LENGTH_HALF*Math.sin(angle) + EMITTER_WIDTH_HALF*Math.cos(angle);
+  emitter_top_y = emitter_center_y - EMITTER_LENGTH_HALF*Math.cos(angle) - EMITTER_WIDTH_HALF*Math.sin(angle);
+  emitter_top = [emitter_top_x , emitter_top_y];
+  emitter_right_x = emitter_center_x + EMITTER_LENGTH_HALF*Math.sin(angle) + EMITTER_WIDTH_HALF*Math.cos(angle);
+  emitter_right_y = emitter_center_y + EMITTER_LENGTH_HALF*Math.cos(angle) - EMITTER_WIDTH_HALF*Math.sin(angle);
+  emitter_right = [emitter_right_x , emitter_right_y];
+  emitter_bottom_x = emitter_center_x + EMITTER_LENGTH_HALF*Math.sin(angle) - EMITTER_WIDTH_HALF*Math.cos(angle);
+  emitter_bottom_y = emitter_center_y + EMITTER_LENGTH_HALF*Math.cos(angle) + EMITTER_WIDTH_HALF*Math.sin(angle);
+  emitter_bottom = [emitter_bottom_x , emitter_bottom_y];
+  emitter = canvas.path(makePathForPolygon([emitter_left,emitter_top,emitter_right,emitter_bottom]))
+                  .attr({'fill':EMITTER_COLOR})
+                  .attr({'id':'emitter'});
+  emitterButton = canvas.circle(emitter_center_x,emitter_center_y,BUTTON_RADIUS)
+                        .attr({'fill':BUTTON_COLOR_UNPRESSED})
+                        .attr({'id':'emitterButton'});
+/* Initial Beam (not necessarily constants) */
+// BR: bottom-right
+  emitter_br_x = emitter_center_x + EMITTER_LENGTH_HALF * Math.sin(angle);
+  emitter_br_y = emitter_center_y + EMITTER_LENGTH_HALF * Math.cos(angle);
+  emitter_br = [emitter_br_x , emitter_br_y]
+  initBeam = canvas.path(makePathForLine([emitter_br , BEAM_CONTACT_POINT]))
+                   .attr({'stroke':FULL_BEAM_COLOR})
+                   .attr({'stroke-width':STANDARD_BEAM_WIDTH})
+                   .attr({'id':'initBeam'});
+
+/* Reflected Beam (not necessarily constants) */
+// ur: upper-right
+  ur_x = Math.tan(angle)*SIM_HEIGHT/2+BEAM_CONTACT_POINT_X;
+  ur_y = 0;
+  ur = [ur_x , ur_y];
+  reflBeam = canvas.path(makePathForLine([ur , BEAM_CONTACT_POINT]))
+                   .attr({'stroke':FULL_BEAM_COLOR})
+                   .attr({'stroke-width':STANDARD_BEAM_WIDTH})
+                   .attr({'id':'reflBeam'});
+
+/* Propagating Beam (not necessarily constants) */
+  newAngle = getNewAngleRefraction(index1,angle,index2);
+// LR: lower-right
+  propBeam = canvas.path(makePathForLine([PROP_LR , BEAM_CONTACT_POINT]))
+                   .attr({'stroke':FULL_BEAM_COLOR})
+                   .attr({'stroke-width':STANDARD_BEAM_WIDTH})
+                   .attr({'id':'propBeam'});
 }
 
-setInterval(updateAngle(),10);
+setInterval(updateAngle,10);
