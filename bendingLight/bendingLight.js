@@ -128,6 +128,18 @@ function emitterUpdate(){
                         .attr({'id':'emitterButton'});
 }
 
+$(document).ready(function(){
+  console.log("This is a hi!");
+  console.log(emitterButton);
+  emitterButton.click(function(){
+    console.log("Hi!");
+    if(emitterButton.attr('fill')==BUTTON_COLOR_UNPRESSED){
+      console.log("Hi, again!");
+      emitterButton.attr({'fill':BUTTON_COLOR_PRESSED});
+    }
+  });
+});
+
 /* Laser View Box Constants */
 var LASER_VIEW_TL_X = STANDARD_MARGIN; // TL: top-left
 var LASER_VIEW_TL_Y = STANDARD_MARGIN;
@@ -256,12 +268,13 @@ $(document).ready(function(){
   });
 });
 */
-
+/*
 $(document).ready(function(){
   $('emitterButton').click(function(){
     console.log("Test.");
   });
 });
+*/
 
 function updateAngle(){
   initBeam.remove();
