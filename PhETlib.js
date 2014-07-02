@@ -45,4 +45,4 @@ function slider(canvas, x, y, w, h, minVal, maxVal, label) {
 	}, 
 			function() {}, //on start
 			function() {}; //on end
-}
+)}
