@@ -211,9 +211,9 @@ function propBeamUpdate(fracProp,angle){
                    .attr({'id':'propBeam'});
 }
 
+reflBeamUpdate(0);
 emitterUpdate();
 initBeamUpdate();
-reflBeamUpdate(0);
 propBeamUpdate(1,0);
 
 canvas.text(LASER_VIEW_TL_X+LASER_VIEW_BOX_WIDTH/2,LASER_VIEW_TL_Y+STANDARD_TEXT_MARGIN,LASER_VIEW_TITLE_TEXT);
@@ -257,6 +257,12 @@ $(document).ready(function(){
 });
 */
 
+$(document).ready(function(){
+  $('emitterButton').click(function(){
+    console.log("Test.");
+  });
+});
+
 function updateAngle(){
   initBeam.remove();
   reflBeam.remove();
@@ -267,12 +273,10 @@ function updateAngle(){
   var propAngle = getNewIndexRefraction(index1,angle,index2);
   var fracRefl = calcReflected(index1,angle,index2,propAngle);
   var fracProp = calcPropagated(index1,angle,index2,propAngle);
+  reflBeamUpdate(fracRefl);
   emitterUpdate();
   initBeamUpdate();
-  reflBeamUpdate(fracRefl);
   propBeamUpdate(fracProp,propAngle);
 }
 
 setInterval(updateAngle,10);
-
-// Notes: update slider to a nicer view, make emitter draggable 
