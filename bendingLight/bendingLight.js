@@ -70,14 +70,18 @@ var LOWER_RECT = canvas.rect(0,SIM_HEIGHT/2,SIM_WIDTH,SIM_HEIGHT/2)
 /* Standard graphical constants */
 var STANDARD_MARGIN = Math.min(8,WH_MIN/8);
 var STANDARD_TEXT_MARGIN = Math.min(12,WH_MIN/12);
+var STANDARD_SLIDER_MARGIN = Math.min(20,SIM_HEIGHT/10);
 var STANDARD_ROUNDING_RADIUS = Math.min(6,WH_MIN/20);
 var STANDARD_BEAM_WIDTH = Math.min(4,WH_MIN/24);
 
 var SLIDER_HEIGHT = Math.min(50,SIM_WIDTH/10);
 var SLIDER_WIDTH = Math.min(300,SIM_WIDTH/3);
 
-/* Slider */
-var angleSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT,SLIDER_WIDTH,SLIDER_HEIGHT,0,PI/2-0.001,"Angle");
+/* Sliders */
+var SLIDER_SPACING = SLIDER_HEIGHT+20;
+var upperIndexSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT-2*SLIDER_SPACING,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,"Upper Material Index of Refraction");
+var lowerIndexSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,"Lower Material Index of Refraction");
+var angleSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT,SLIDER_WIDTH,SLIDER_HEIGHT,0,PI/2-0.001,"Angle of Incidence (Radians)");
 
 /* Global variables */
 buttonPressed = false;
@@ -122,7 +126,8 @@ function emitterUpdate(){
   var emitter_bottom = [emitter_bottom_x , emitter_bottom_y];
   emitter = canvas.path(makePathForPolygon([emitter_left,emitter_top,emitter_right,emitter_bottom]))
                   .attr({'fill':EMITTER_COLOR})
-                  .attr({'id':'emitter'});
+                  .attr({'id':'emitter'})
+                  //.glow();
   emitterButton = canvas.circle(emitter_center_x,emitter_center_y,BUTTON_RADIUS)
                         .attr({'fill':BUTTON_COLOR_UNPRESSED})
                         .attr({'id':'emitterButton'});
@@ -238,7 +243,11 @@ canvas.text(RESET_BUTTON_TL_X+RESET_BUTTON_WIDTH/2,RESET_BUTTON_TL_Y+STANDARD_TE
 /* Calculate angle of refraction th2 */
 /* Angles th1, th2 in radians */
 function getNewAngleRefraction(n1,th1,n2){
-  return Math.asin(n1*Math.sin(th1)/n2);
+  if(n1*Math.sin(th1)/n2<=1){
+    return Math.asin(n1*Math.sin(th1)/n2);
+  }else{
+    return "total";
+  }
 }
 
 /* Calculate index of refraction n2 */
@@ -250,13 +259,13 @@ function getNewIndexRefraction(n1,th1,th2){
 /* Calculate intensity of reflection */
 /* Angles th1, th2 in radians */
 function calcReflected(n1,th1,n2,th2){
-  return Math.pow((n1*Math.cos(th2)-n2*Math.cos(th1))/(n1*Math.cos(th2)+n2*Math.cos(th1)),2);
+  return Math.pow((n1*Math.cos(th1)-n2*Math.cos(th2))/(n1*Math.cos(th1)+n2*Math.cos(th2)),2);
 }
 
 /* Calculate intensity of transmission */
 /* Angles th1, th2 in radians */
 function calcPropagated(n1,th1,n2,th2){
-  return 4*n1*n2*Math.cos(th1)*Math.cos(th2)/Math.pow(n1*Math.cos(th2)+n2*Math.cos(th1),2);
+  return 4*n1*n2*Math.cos(th1)*Math.cos(th2)/Math.pow(n1*Math.cos(th1)+n2*Math.cos(th2),2);
 }
 
 /* Not working for some reason 
@@ -283,13 +292,21 @@ function updateAngle(){
   emitter.remove();
   emitterButton.remove();
   angle = angleSlider.val;
-  var propAngle = getNewIndexRefraction(index1,angle,index2);
-  var fracRefl = calcReflected(index1,angle,index2,propAngle);
-  var fracProp = calcPropagated(index1,angle,index2,propAngle);
+  index1 = upperIndexSlider.val;
+  index2 = lowerIndexSlider.val;
+  var propAngle = getNewAngleRefraction(index1,angle,index2);
+  if(propAngle=="total"){
+    var fracRefl = 1;
+    var fracProp = 0;
+  }else{
+    var fracRefl = calcReflected(index1,angle,index2,propAngle);
+    var fracProp = calcPropagated(index1,angle,index2,propAngle);
+  }
   reflBeamUpdate(fracRefl);
   emitterUpdate();
   initBeamUpdate();
   propBeamUpdate(fracProp,propAngle);
 }
 
-setInterval(updateAngle,10);
+/* Calls updateAngle() every 20 milliseconds */
+setInterval(updateAngle,20);
