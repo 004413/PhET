@@ -14,6 +14,10 @@ var LASER_VIEW_BOX_COLOR = '#E0E0E0';
 var MATERIAL_BOX_COLOR = LASER_VIEW_BOX_COLOR;
 var RESET_BUTTON_COLOR = '#E0E000';
 var FULL_BEAM_COLOR = "#FF0000";
+var REFL_TEXT_COLOR = "#FFA000";
+var PROP_TEXT_COLOR = "#A0FF00";
+var INDEX_SLIDER_COLOR = "#00A000";
+var ANGLE_SLIDER_COLOR = "#FFFF00";
 
 /* Text constants */
 var LASER_VIEW_TITLE_TEXT = "Laser View";
@@ -26,10 +30,10 @@ var RESET_BUTTON_TEXT = "Reset All";
 /* Defaults */
 var INDICES = {'Air':AIR_INDEX,'Water':WATER_INDEX,'Glass':GLASS_INDEX};
 var MATERIAL1_DEFAULT = "Air";
-var MATERIAL2_DEFAULT = "Water";
+var MATERIAL2_DEFAULT = "Glass";
 var INDEX1_DEFAULT = INDICES[MATERIAL1_DEFAULT];
 var INDEX2_DEFAULT = INDICES[MATERIAL2_DEFAULT];
-var DEFAULT_ANGLE = 0;
+var DEFAULT_ANGLE = PI/4;
 var NORMAL_SHOWN_DEFAULT = true;
 var DEFAULT_UPPER_RECT_COLOR = '#E0E0FF';
 var DEFAULT_LOWER_RECT_COLOR = '#A0A0FF';
@@ -127,9 +131,9 @@ var SLIDER_WIDTH = Math.min(300,SIM_WIDTH/3);
 
 /* Sliders */
 var SLIDER_SPACING = SLIDER_HEIGHT+20;
-var upperIndexSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING*2,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,1,'#00ff00',"Upper Material Index of Refraction");
-var lowerIndexSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,1.6,'#00ff00',"Lower Material Index of Refraction");
-var angleSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT,SLIDER_WIDTH,SLIDER_HEIGHT,0,PI/2-0.001,PI/4,'#ffff00',"Angle of Incidence (Radians)");
+var upperIndexSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING*2,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX1_DEFAULT,INDEX_SLIDER_COLOR,"Upper Material Index of Refraction");
+var lowerIndexSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX2_DEFAULT,INDEX_SLIDER_COLOR,"Lower Material Index of Refraction");
+var angleSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT,SLIDER_WIDTH,SLIDER_HEIGHT,0,PI/2-0.001,DEFAULT_ANGLE,ANGLE_SLIDER_COLOR,"Angle of Incidence (Radians)");
 
 /* Global variables */
 buttonPressed = false;
@@ -137,7 +141,7 @@ material1 = MATERIAL1_DEFAULT;
 material2 = MATERIAL2_DEFAULT;
 index1 = INDEX1_DEFAULT;
 index2 = INDEX2_DEFAULT;
-angle = PI/4;
+angle = DEFAULT_ANGLE;
 normalShown = NORMAL_SHOWN_DEFAULT;
 
 /* Beam Contact Constants */
@@ -283,15 +287,33 @@ reflBeamUpdate(0,DEFAULT_UPPER_RECT_COLOR);
 emitterUpdate();
 initBeamUpdate();
 
-/*
-canvas.text(LASER_VIEW_TL_X+LASER_VIEW_BOX_WIDTH/2,LASER_VIEW_TL_Y+STANDARD_TEXT_MARGIN,LASER_VIEW_TITLE_TEXT);
-canvas.text(MATERIAL_BOX_TL_X+MATERIAL_BOX_WIDTH/2,UPPER_MATERIAL_BOX_TL_Y+STANDARD_TEXT_MARGIN,MATERIAL_TAG);
-canvas.text(MATERIAL_BOX_TL_X+MATERIAL_BOX_WIDTH/2,LOWER_MATERIAL_BOX_TL_Y+STANDARD_TEXT_MARGIN,MATERIAL_TAG);*/
-/*
-canvas.text(RESET_BUTTON_TL_X+RESET_BUTTON_WIDTH/2,RESET_BUTTON_TL_Y+STANDARD_TEXT_MARGIN,RESET_BUTTON_TEXT);
-*/
-/* Angles are with respect to the normal. */
+/* Reflection and Propagation Quantity Text Constants */
+var BIG_TEXT_MARGIN=24;
+var REFLECTED_OFFSET=54;
+var PROPAGATED_OFFSET=68;
+var BIG_FONT_SIZE=30;
+var REFL_PROP_QUANT_HORIZ_OFFSET=200;
 
+reflLabel = canvas.text(BIG_TEXT_MARGIN+REFLECTED_OFFSET,SIM_HEIGHT/2-BIG_TEXT_MARGIN,"Reflected:")
+                  .attr({'font-size':BIG_FONT_SIZE})
+                  .attr({'fill':REFL_TEXT_COLOR});
+propLabel = canvas.text(BIG_TEXT_MARGIN+PROPAGATED_OFFSET,SIM_HEIGHT/2+BIG_TEXT_MARGIN,"Propagated:")
+                  .attr({'font-size':BIG_FONT_SIZE})
+                  .attr({'fill':PROP_TEXT_COLOR});
+
+/* Reflection and Propagation Quantity Text Setup and Update */
+function reflPropTextUpdate(fracRefl,fracProp){
+  var percentRefl = Math.round(100*fracRefl);
+  var percentProp = Math.round(100*fracProp);
+  reflText = canvas.text(BIG_TEXT_MARGIN+REFL_PROP_QUANT_HORIZ_OFFSET,SIM_HEIGHT/2-BIG_TEXT_MARGIN,percentRefl+"%")
+                       .attr({'font-size':BIG_FONT_SIZE})
+                       .attr({'fill':REFL_TEXT_COLOR});
+  propText = canvas.text(BIG_TEXT_MARGIN+REFL_PROP_QUANT_HORIZ_OFFSET,SIM_HEIGHT/2+BIG_TEXT_MARGIN,percentProp+"%")
+                       .attr({'font-size':BIG_FONT_SIZE})
+                       .attr({'fill':PROP_TEXT_COLOR});
+}
+
+/* Angles are with respect to the normal. */
 /* Calculate angle of refraction th2 */
 /* Angles th1, th2 in radians */
 function getNewAngleRefraction(n1,th1,n2){
@@ -301,6 +323,17 @@ function getNewAngleRefraction(n1,th1,n2){
     return "total";
   }
 }
+
+var newAngle = getNewAngleRefraction(index1,angle,index2);
+reflPropTextUpdate(calcReflected(index1,angle,index2,newAngle),calcPropagated(index1,angle,index2,newAngle));
+
+/*
+canvas.text(LASER_VIEW_TL_X+LASER_VIEW_BOX_WIDTH/2,LASER_VIEW_TL_Y+STANDARD_TEXT_MARGIN,LASER_VIEW_TITLE_TEXT);
+canvas.text(MATERIAL_BOX_TL_X+MATERIAL_BOX_WIDTH/2,UPPER_MATERIAL_BOX_TL_Y+STANDARD_TEXT_MARGIN,MATERIAL_TAG);
+canvas.text(MATERIAL_BOX_TL_X+MATERIAL_BOX_WIDTH/2,LOWER_MATERIAL_BOX_TL_Y+STANDARD_TEXT_MARGIN,MATERIAL_TAG);*/
+/*
+canvas.text(RESET_BUTTON_TL_X+RESET_BUTTON_WIDTH/2,RESET_BUTTON_TL_Y+STANDARD_TEXT_MARGIN,RESET_BUTTON_TEXT);
+*/
 
 /* Calculate index of refraction n2 */
 /* Angles th1, th2 in radians */
@@ -345,6 +378,8 @@ function updateAngle(){
   emitterButton.remove();
   upperRect.remove();
   lowerRect.remove();
+  reflText.remove();
+  propText.remove();
   angle = angleSlider.val;
   index1 = upperIndexSlider.val;
   index2 = lowerIndexSlider.val;
@@ -373,6 +408,7 @@ function updateAngle(){
   }
   initBeamUpdate();
   emitterUpdate();
+  reflPropTextUpdate(fracRefl,fracProp);
 }
 
 /* Calls updateAngle() every 20 milliseconds */
