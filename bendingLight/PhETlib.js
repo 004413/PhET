@@ -3,20 +3,21 @@ function roundTo3(x) {
 }
 
 //Creates custom svg slider element
-function slider(canvas, x, y, w, h, minVal, maxVal, label) { 
+function slider(canvas, x, y, w, h, minVal, maxVal, defaultVal, handleColor, label) { 
 	var body = canvas.rect(x, y, w, h);
-	var handle = canvas.rect(x, y, (w/50), h);
+        var defaultPercentage = (defaultVal-minVal) / (maxVal-minVal);
+	var handle = canvas.rect(x + 39*w/40*defaultPercentage, y, (w/40), h)
+                           .attr({'fill':handleColor});
 	var bodyX = body.attr('x');
 	var handleX = handle.attr('x');
 	var handleW = handle.attr('width');
 	var self = this;
-	self.val = roundTo3(minVal); //initial value to be changed when dragged
+	self.val = roundTo3(defaultVal); //initial value to be changed when dragged
 	//self.valFraction = 0; 
 	self.maxVal = roundTo3(maxVal);
 	self.handle = handle;
 	var disp = canvas.text((x + (w/2)), (y - 10), label + ': ' + self.val);
 	body.attr({fill:'white'});
-	handle.attr({fill:'gray'});
 	body.node.className = 'slider';
 	
 	function updateDisplay() {
