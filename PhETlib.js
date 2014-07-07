@@ -11,7 +11,6 @@ function slider(canvas, x, y, w, h, minVal, maxVal, label) {
 	var handleW = handle.attr('width');
 	var self = this;
 	self.val = roundTo3(minVal); //initial value to be changed when dragged
-	//self.valFraction = 0; 
 	self.maxVal = roundTo3(maxVal);
 	self.handle = handle;
 	var disp = canvas.text((x + (w/2)), (y - 10), label + ': ' + self.val);
@@ -22,7 +21,7 @@ function slider(canvas, x, y, w, h, minVal, maxVal, label) {
 	function updateDisplay() {
 		var handleX = handle.attr('x');
 		var bodyX = body.attr('x');
-		var barDist = (handleX + (handleW / 2)) - bodyX;
+		var barDist = (handleX) - bodyX;
 		var val = (barDist / w) * (maxVal - minVal) + minVal; //value based on position of slider bar
 		self.val = roundTo3(val); 
 		if (handleX == bodyX) {
@@ -32,8 +31,6 @@ function slider(canvas, x, y, w, h, minVal, maxVal, label) {
 			self.val = roundTo3(maxVal);	
 		}
 		disp.attr('text', label + ': ' +self.val);
-		//valFraction = (self.val - minVal) / (maxVal - minVal);
-		//self.valFraction = roundTo3(valFraction);
 	}
 	
 	//move slider bar with mouse
@@ -44,5 +41,17 @@ function slider(canvas, x, y, w, h, minVal, maxVal, label) {
 		updateDisplay();
 	}, 
 			function() {}, //on start
-			function() {}; //on end
-)}
+			function() {} //on end
+	);
+	
+	//clicks on slider body bring slider bar to click position
+	body.drag(function(dx,dy,mx,my) { 
+		var newX = Math.min(bodyX + w - handleW, mx);
+		newX = Math.max(bodyX, newX);
+		handle.attr({x:newX}) 
+		updateDisplay();
+	}, 
+			  function() {},
+			  function() {} 
+	);
+}
