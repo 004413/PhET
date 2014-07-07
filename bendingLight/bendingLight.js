@@ -129,11 +129,14 @@ var STANDARD_BEAM_WIDTH = Math.min(4,WH_MIN/24);
 var SLIDER_HEIGHT = Math.min(30,SIM_WIDTH/10);
 var SLIDER_WIDTH = Math.min(300,SIM_WIDTH/3);
 
+var COMPARISONS_OFFSET = 20;
+var LABEL_OFFSET = 10;
+
 /* Sliders */
 var SLIDER_SPACING = SLIDER_HEIGHT+20;
-var upperIndexSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING*2,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX1_DEFAULT,INDEX_SLIDER_COLOR,"Upper Material Index of Refraction");
-var lowerIndexSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX2_DEFAULT,INDEX_SLIDER_COLOR,"Lower Material Index of Refraction");
-var angleSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT,SLIDER_WIDTH,SLIDER_HEIGHT,0,PI/2-0.001,DEFAULT_ANGLE,ANGLE_SLIDER_COLOR,"Angle of Incidence (Radians)");
+var upperIndexSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING*2-COMPARISONS_OFFSET,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX1_DEFAULT,INDEX_SLIDER_COLOR,"Upper Material Index of Refraction",-LABEL_OFFSET);
+var lowerIndexSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING-COMPARISONS_OFFSET,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX2_DEFAULT,INDEX_SLIDER_COLOR,"Lower Material Index of Refraction",LABEL_OFFSET);
+var angleSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT,SLIDER_WIDTH,SLIDER_HEIGHT,0,PI/2-0.001,DEFAULT_ANGLE,ANGLE_SLIDER_COLOR,"Angle of Incidence (Radians)",-LABEL_OFFSET);
 
 /* Global variables */
 buttonPressed = false;
@@ -370,7 +373,8 @@ $(document).ready(function(){
 });
 */
 
-function updateAngle(){
+/* Remove old entities to make room for the updated versions */
+function removeOldVersions(){
   initBeam.remove();
   reflBeam.remove();
   propBeam.remove();
@@ -380,6 +384,10 @@ function updateAngle(){
   lowerRect.remove();
   reflText.remove();
   propText.remove();
+}
+
+function updateAngle(){
+  removeOldVersions();
   angle = angleSlider.val;
   index1 = upperIndexSlider.val;
   index2 = lowerIndexSlider.val;
@@ -412,4 +420,4 @@ function updateAngle(){
 }
 
 /* Calls updateAngle() every 20 milliseconds */
-setInterval(updateAngle,20);
+setInterval(updateAngle,10);
