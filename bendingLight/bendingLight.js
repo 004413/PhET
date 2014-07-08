@@ -4,7 +4,7 @@
 var PI = Math.PI;
 var AIR_INDEX = 1;
 var WATER_INDEX = 1.33;
-var GLASS_INDEX = 1.5;
+var GLASS_INDEX = 1.6;
 
 /* Color constants */
 var EMITTER_COLOR = '#808080';
@@ -106,8 +106,8 @@ function getColorFracFromAToB(colorA,colorB,fracFromAToB){
 }
 
 /* Simulation Setup */
-var SIM_WIDTH = 1200; 
-var SIM_HEIGHT = 600;
+var SIM_WIDTH = 800; 
+var SIM_HEIGHT = 500;
 var WH_MIN = Math.min(SIM_WIDTH,SIM_HEIGHT); // Minimum of simulation window width and height
 canvas = Raphael(0,0,SIM_WIDTH,SIM_HEIGHT);
 function backgroundUpdate(upColor,loColor){
@@ -131,12 +131,23 @@ var SLIDER_WIDTH = Math.min(300,SIM_WIDTH/3);
 
 var COMPARISONS_OFFSET = 20;
 var LABEL_OFFSET = 10;
+var MIDDLE_TEXT_OFFSET = 11; // Derived quantity, could be redefined in terms of other constants
 
 /* Sliders */
 var SLIDER_SPACING = SLIDER_HEIGHT+20;
-var upperIndexSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING*2-COMPARISONS_OFFSET,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX1_DEFAULT,INDEX_SLIDER_COLOR,"Upper Material Index of Refraction",-LABEL_OFFSET);
-var lowerIndexSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING-COMPARISONS_OFFSET,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX2_DEFAULT,INDEX_SLIDER_COLOR,"Lower Material Index of Refraction",LABEL_OFFSET);
-var angleSlider = new slider(canvas,0,SIM_HEIGHT-SLIDER_HEIGHT,SLIDER_WIDTH,SLIDER_HEIGHT,0,PI/2-0.001,DEFAULT_ANGLE,ANGLE_SLIDER_COLOR,"Angle of Incidence (Radians)",-LABEL_OFFSET);
+var upperIndexSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING*2-COMPARISONS_OFFSET-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX1_DEFAULT,INDEX_SLIDER_COLOR,"Upper Material Index of Refraction",-LABEL_OFFSET);
+var lowerIndexSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING-COMPARISONS_OFFSET-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX2_DEFAULT,INDEX_SLIDER_COLOR,"Lower Material Index of Refraction",SLIDER_HEIGHT+LABEL_OFFSET);
+var angleSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,0,PI/2-0.001,DEFAULT_ANGLE,ANGLE_SLIDER_COLOR,"Angle of Incidence (Radians)",-LABEL_OFFSET);
+
+var AIR_TEXT_X_LOCATION = SLIDER_WIDTH/80+STANDARD_MARGIN;
+var WATER_TEXT_X_LOCATION = 17*SLIDER_WIDTH/75+STANDARD_MARGIN;
+var GLASS_TEXT_X_LOCATION = 2*SLIDER_WIDTH/5+STANDARD_MARGIN;
+var DIAMOND_TEXT_X_LOCATION = 19*SLIDER_WIDTH/20+STANDARD_MARGIN;
+
+var airText = canvas.text(AIR_TEXT_X_LOCATION,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING-COMPARISONS_OFFSET-MIDDLE_TEXT_OFFSET-STANDARD_MARGIN,"Air");
+var waterText = canvas.text(WATER_TEXT_X_LOCATION,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING-COMPARISONS_OFFSET-MIDDLE_TEXT_OFFSET-STANDARD_MARGIN,"Water");
+var glassText = canvas.text(GLASS_TEXT_X_LOCATION,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING-COMPARISONS_OFFSET-MIDDLE_TEXT_OFFSET-STANDARD_MARGIN,"Glass");
+var diamondText = canvas.text(DIAMOND_TEXT_X_LOCATION,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING-COMPARISONS_OFFSET-MIDDLE_TEXT_OFFSET-STANDARD_MARGIN,"Diamond");
 
 /* Global variables */
 buttonPressed = false;
@@ -183,11 +194,13 @@ function emitterUpdate(){
                   .attr({'fill':EMITTER_COLOR})
                   .attr({'id':'emitter'})
                   //.glow();
-  emitterButton = canvas.circle(emitter_center_x,emitter_center_y,BUTTON_RADIUS)
+/*  emitterButton = canvas.circle(emitter_center_x,emitter_center_y,BUTTON_RADIUS)
                         .attr({'fill':BUTTON_COLOR_UNPRESSED})
                         .attr({'id':'emitterButton'});
+*/
 }
 
+/*
 $(document).ready(function(){
   emitterButton.click(function(){
     console.log("Hi!");
@@ -197,6 +210,7 @@ $(document).ready(function(){
     }
   });
 });
+*/
 
 /* Laser View Box Constants */
 var LASER_VIEW_TL_X = STANDARD_MARGIN; // TL: top-left
@@ -263,6 +277,7 @@ function initBeamUpdate(){
 
 /* Reflected Beam Setup and Update */
 function reflBeamUpdate(fracRefl,background){
+  console.log(background);
   var ur_x = Math.tan(angle)*SIM_HEIGHT/2+BEAM_CONTACT_POINT_X; // ur: upper-right
   var ur_y = 0;
   var ur = [ur_x , ur_y];
@@ -274,8 +289,9 @@ function reflBeamUpdate(fracRefl,background){
 }
 
 /* Propagating Beam Setup and Update */
-function propBeamUpdate(fracProp,background){
-  var prop_lr_x = Math.tan(angle)*SIM_HEIGHT/2+BEAM_CONTACT_POINT_X; // lr: lower-right
+function propBeamUpdate(fracProp,propAngle,background){
+  console.log("frac"+background);
+  var prop_lr_x = Math.tan(propAngle)*SIM_HEIGHT/2+BEAM_CONTACT_POINT_X; // lr: lower-right
   var prop_lr_y = SIM_HEIGHT;
   var prop_lr = [prop_lr_x , prop_lr_y];
   var color = getColorFracFromAToB(background,FULL_BEAM_COLOR,fracProp);
@@ -285,35 +301,41 @@ function propBeamUpdate(fracProp,background){
                    .attr({'id':'propBeam'});
 }
 
-propBeamUpdate(1,DEFAULT_LOWER_RECT_COLOR);
+propBeamUpdate(1,getNewAngleRefraction(index1,DEFAULT_ANGLE,index2),DEFAULT_LOWER_RECT_COLOR);
 reflBeamUpdate(0,DEFAULT_UPPER_RECT_COLOR);
 emitterUpdate();
 initBeamUpdate();
 
 /* Reflection and Propagation Quantity Text Constants */
-var BIG_TEXT_MARGIN=24;
-var REFLECTED_OFFSET=54;
-var PROPAGATED_OFFSET=68;
-var BIG_FONT_SIZE=30;
-var REFL_PROP_QUANT_HORIZ_OFFSET=200;
+var BIG_FONT_SIZE=Math.min(20,WH_MIN/31);
+var BIG_TEXT_MARGIN=BIG_FONT_SIZE/4;
+var QUANT_HORIZ_OFFSET=8.5*BIG_FONT_SIZE;
 
-reflLabel = canvas.text(BIG_TEXT_MARGIN+REFLECTED_OFFSET,SIM_HEIGHT/2-BIG_TEXT_MARGIN,"Reflected:")
+/* The coefficient of 3 in the below is derived from being half the ratio of conversion 
+from BIG_FONT_SIZE to BIG_TEXT_MARGIN, plus 1 for the margin itself, since the vertical
+point of reference for text is the center. */
+
+reflLabel = canvas.text(BIG_TEXT_MARGIN,SIM_HEIGHT/2-3*BIG_TEXT_MARGIN,"Reflected:")
                   .attr({'font-size':BIG_FONT_SIZE})
-                  .attr({'fill':REFL_TEXT_COLOR});
-propLabel = canvas.text(BIG_TEXT_MARGIN+PROPAGATED_OFFSET,SIM_HEIGHT/2+BIG_TEXT_MARGIN,"Propagated:")
+                  .attr({'fill':REFL_TEXT_COLOR})
+                  .attr({'text-anchor':'start'}); // left aligns
+propLabel = canvas.text(BIG_TEXT_MARGIN,SIM_HEIGHT/2+3*BIG_TEXT_MARGIN,"Propagated:")
                   .attr({'font-size':BIG_FONT_SIZE})
-                  .attr({'fill':PROP_TEXT_COLOR});
+                  .attr({'fill':PROP_TEXT_COLOR})
+                  .attr({'text-anchor':'start'}); // left aligns
 
 /* Reflection and Propagation Quantity Text Setup and Update */
 function reflPropTextUpdate(fracRefl,fracProp){
   var percentRefl = Math.round(100*fracRefl);
   var percentProp = Math.round(100*fracProp);
-  reflText = canvas.text(BIG_TEXT_MARGIN+REFL_PROP_QUANT_HORIZ_OFFSET,SIM_HEIGHT/2-BIG_TEXT_MARGIN,percentRefl+"%")
-                       .attr({'font-size':BIG_FONT_SIZE})
-                       .attr({'fill':REFL_TEXT_COLOR});
-  propText = canvas.text(BIG_TEXT_MARGIN+REFL_PROP_QUANT_HORIZ_OFFSET,SIM_HEIGHT/2+BIG_TEXT_MARGIN,percentProp+"%")
-                       .attr({'font-size':BIG_FONT_SIZE})
-                       .attr({'fill':PROP_TEXT_COLOR});
+  reflText = canvas.text(BIG_TEXT_MARGIN+QUANT_HORIZ_OFFSET,SIM_HEIGHT/2-3*BIG_TEXT_MARGIN,percentRefl+"%")
+                   .attr({'font-size':BIG_FONT_SIZE})
+                   .attr({'fill':REFL_TEXT_COLOR})
+                   .attr({'text-anchor':'end'}); // right aligns
+  propText = canvas.text(BIG_TEXT_MARGIN+QUANT_HORIZ_OFFSET,SIM_HEIGHT/2+3*BIG_TEXT_MARGIN,percentProp+"%")
+                   .attr({'font-size':BIG_FONT_SIZE})
+                   .attr({'fill':PROP_TEXT_COLOR})
+                   .attr({'text-anchor':'end'}); // right aligns
 }
 
 /* Angles are with respect to the normal. */
@@ -333,7 +355,8 @@ reflPropTextUpdate(calcReflected(index1,angle,index2,newAngle),calcPropagated(in
 /*
 canvas.text(LASER_VIEW_TL_X+LASER_VIEW_BOX_WIDTH/2,LASER_VIEW_TL_Y+STANDARD_TEXT_MARGIN,LASER_VIEW_TITLE_TEXT);
 canvas.text(MATERIAL_BOX_TL_X+MATERIAL_BOX_WIDTH/2,UPPER_MATERIAL_BOX_TL_Y+STANDARD_TEXT_MARGIN,MATERIAL_TAG);
-canvas.text(MATERIAL_BOX_TL_X+MATERIAL_BOX_WIDTH/2,LOWER_MATERIAL_BOX_TL_Y+STANDARD_TEXT_MARGIN,MATERIAL_TAG);*/
+canvas.text(MATERIAL_BOX_TL_X+MATERIAL_BOX_WIDTH/2,LOWER_MATERIAL_BOX_TL_Y+STANDARD_TEXT_MARGIN,MATERIAL_TAG);
+*/
 /*
 canvas.text(RESET_BUTTON_TL_X+RESET_BUTTON_WIDTH/2,RESET_BUTTON_TL_Y+STANDARD_TEXT_MARGIN,RESET_BUTTON_TEXT);
 */
@@ -365,6 +388,7 @@ $(document).ready(function(){
   });
 });
 */
+
 /*
 $(document).ready(function(){
   $('emitterButton').click(function(){
@@ -379,7 +403,7 @@ function removeOldVersions(){
   reflBeam.remove();
   propBeam.remove();
   emitter.remove();
-  emitterButton.remove();
+  //emitterButton.remove();
   upperRect.remove();
   lowerRect.remove();
   reflText.remove();
@@ -395,7 +419,8 @@ function updateAngle(){
   fracifiedIndex2 = mapToFrac(index2);
   var backgroundColor1 = convertFracOfBlueToColorString(fracifiedIndex1);
   var backgroundColor2 = convertFracOfBlueToColorString(fracifiedIndex2);
-  console.log(backgroundColor1);
+  console.log("BC1"+backgroundColor1);
+  console.log("BC2"+backgroundColor2);
   backgroundUpdate(backgroundColor1, backgroundColor2);
   upperRect.toBack();
   lowerRect.toBack();
@@ -408,15 +433,17 @@ function updateAngle(){
     var fracProp = calcPropagated(index1,angle,index2,propAngle);
   }
   if(fracRefl>0.5){
-    propBeamUpdate(fracProp,backgroundColor2);
+    propBeamUpdate(fracProp,propAngle,backgroundColor2);
     reflBeamUpdate(fracRefl,backgroundColor1);
   }else{
     reflBeamUpdate(fracRefl,backgroundColor1);
-    propBeamUpdate(fracProp,backgroundColor2);
+    propBeamUpdate(fracProp,propAngle,backgroundColor2);
   }
   initBeamUpdate();
   emitterUpdate();
   reflPropTextUpdate(fracRefl,fracProp);
+  reflLabel.toFront();
+  propLabel.toFront();
 }
 
 /* Calls updateAngle() every 20 milliseconds */

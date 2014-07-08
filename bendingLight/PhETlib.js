@@ -4,7 +4,6 @@ function roundTo3(x) {
 
 //Creates custom svg slider element
 function slider(canvas, x, y, w, h, minVal, maxVal, defaultVal, handleColor, label, labelVerticalOffset) { 
-	console.log(labelVerticalOffset);
 	var body = canvas.rect(x, y, w, h);
         var defaultPercentage = (defaultVal-minVal) / (maxVal-minVal);
 	var handle = canvas.rect(x + 39*w/40*defaultPercentage, y, (w/40), h)
@@ -55,4 +54,10 @@ function slider(canvas, x, y, w, h, minVal, maxVal, defaultVal, handleColor, lab
 			function() {},
 			function() {}
 	);
-}	
+	
+	//change cursor on mouseover
+	body.attr('cursor', 'pointer');
+	handle.attr('cursor', 'pointer');
+}
+
+	
