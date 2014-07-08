@@ -3,25 +3,26 @@ function roundTo3(x) {
 }
 
 //Creates custom svg slider element
-function slider(canvas, x, y, w, h, minVal, maxVal, label) { 
+function slider(canvas, x, y, w, h, minVal, maxVal, defaultVal, handleColor, label, labelVerticalOffset) { 
 	var body = canvas.rect(x, y, w, h);
-	var handle = canvas.rect(x, y, (w/50), h);
+        var defaultPercentage = (defaultVal-minVal) / (maxVal-minVal);
+	var handle = canvas.rect(x + 39*w/40*defaultPercentage, y, (w/40), h)
+                           .attr({'fill':handleColor});
 	var bodyX = body.attr('x');
 	var handleX = handle.attr('x');
 	var handleW = handle.attr('width');
 	var self = this;
-	self.val = roundTo3(minVal); //initial value to be changed when dragged
+	self.val = roundTo3(defaultVal); //initial value to be changed when dragged
 	self.maxVal = roundTo3(maxVal);
 	self.handle = handle;
-	var disp = canvas.text((x + (w/2)), (y - 10), label + ': ' + self.val);
+	var disp = canvas.text((x + (w/2)), (y + labelVerticalOffset), label + ': ' + self.val);
 	body.attr({fill:'white'});
-	handle.attr({fill:'gray'});
 	body.node.className = 'slider';
 	
 	function updateDisplay() {
 		var handleX = handle.attr('x');
 		var bodyX = body.attr('x');
-		var barDist = (handleX) - bodyX;
+		var barDist = handleX - bodyX;
 		var val = (barDist / w) * (maxVal - minVal) + minVal; //value based on position of slider bar
 		self.val = roundTo3(val); 
 		if (handleX == bodyX) {
@@ -32,30 +33,31 @@ function slider(canvas, x, y, w, h, minVal, maxVal, label) {
 		}
 		disp.attr('text', label + ': ' +self.val);
 	}
-	
 	//move slider bar with mouse
 	handle.drag(function(dx,dy,mx,my) { //on move
 		var newX = Math.min(bodyX + w - handleW, mx);
 		newX = Math.max(bodyX, newX);
-		this.attr({x:newX}) 
+		this.attr({x:newX});
 		updateDisplay();
-	}, 
+	},
 			function() {}, //on start
 			function() {} //on end
 	);
-	
+
 	//clicks on slider body bring slider bar to click position
-	body.drag(function(dx,dy,mx,my) { 
+	body.drag(function(dx,dy,mx,my) {
 		var newX = Math.min(bodyX + w - handleW, mx);
 		newX = Math.max(bodyX, newX);
-		handle.attr({x:newX}) 
+		handle.attr({x:newX});
 		updateDisplay();
-	}, 
-			  function() {},
-			  function() {} 
+	},
+			function() {},
+			function() {}
 	);
 	
 	//change cursor on mouseover
 	body.attr('cursor', 'pointer');
 	handle.attr('cursor', 'pointer');
 }
+
+	
