@@ -14,9 +14,12 @@ function slider(canvas, x, y, w, h, minVal, maxVal, label) {
 	self.maxVal = roundTo3(maxVal);
 	self.handle = handle;
 	var disp = canvas.text((x + (w/2)), (y - 10), label + ': ' + self.val);
+	disp.attr('font-weight', 'bold');
 	body.attr({fill:'white'});
 	handle.attr({fill:'gray'});
 	body.node.className = 'slider';
+	canvas.text(x, (y - 7), minVal);
+	canvas.text((x + w), (y - 7), maxVal);
 	
 	function updateDisplay() {
 		var handleX = handle.attr('x');
@@ -55,7 +58,7 @@ function slider(canvas, x, y, w, h, minVal, maxVal, label) {
 			  function() {} 
 	);
 	
-	body.click(function(event) {
+	body.mousedown(function(event) {
 		var newX = Math.min(bodyX + w - handleW, event.clientX);
 		newX = Math.max(bodyX, newX);
 		handle.attr({x:newX}) 
@@ -66,16 +69,3 @@ function slider(canvas, x, y, w, h, minVal, maxVal, label) {
 	body.attr('cursor', 'pointer');
 	handle.attr('cursor', 'pointer');
 }
-		handle.attr({x:newX});
-		updateDisplay();
-	},
-			function() {},
-			function() {}
-	);
-	
-	//change cursor on mouseover
-	body.attr('cursor', 'pointer');
-	handle.attr('cursor', 'pointer');
-}
-
-	
