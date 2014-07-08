@@ -54,4 +54,8 @@ function slider(canvas, x, y, w, h, minVal, maxVal, label) {
 			  function() {},
 			  function() {} 
 	);
+	
+	//change cursor on mouseover
+	body.attr('cursor', 'pointer');
+	handle.attr('cursor', 'pointer');
 }
