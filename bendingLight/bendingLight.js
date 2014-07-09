@@ -114,8 +114,8 @@ function getColorFracFromAToB(colorA,colorB,fracFromAToB){
 }
 
 /* Simulation Setup */
-var SIM_WIDTH = Math.min(1200,$(window).width()); 
-var SIM_HEIGHT = Math.min(600,$(window).width());
+var SIM_WIDTH = Math.min(600,$(window).width()); 
+var SIM_HEIGHT = Math.min(500,$(window).width());
 var WH_MIN = Math.min(SIM_WIDTH,SIM_HEIGHT); // Minimum of simulation window width and height
 canvas = Raphael(0,0,SIM_WIDTH,SIM_HEIGHT);
 function backgroundUpdate(upColor,loColor){
@@ -152,9 +152,9 @@ normalShown = NORMAL_SHOWN_DEFAULT;
 
 /* Sliders */
 var SLIDER_SPACING = SLIDER_HEIGHT+20;
-var upperIndexSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING*2-COMPARISONS_OFFSET-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX1_DEFAULT,INDEX_SLIDER_COLOR,"Upper Material Index of Refraction",-LABEL_OFFSET);
-var lowerIndexSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING-COMPARISONS_OFFSET-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX2_DEFAULT,INDEX_SLIDER_COLOR,"Lower Material Index of Refraction",SLIDER_HEIGHT+LABEL_OFFSET);
-var angleSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,0,roundTo3(PI/2-0.001),DEFAULT_ANGLE,ANGLE_SLIDER_COLOR,"Angle of Incidence (Radians)",-LABEL_OFFSET);
+var upperIndexSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING*2-COMPARISONS_OFFSET-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX1_DEFAULT,INDEX_SLIDER_COLOR,"Top Refractive Index",-LABEL_OFFSET);
+var lowerIndexSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING-COMPARISONS_OFFSET-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX2_DEFAULT,INDEX_SLIDER_COLOR,"Bottom Refractive Index",SLIDER_HEIGHT+LABEL_OFFSET);
+var angleSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,0,roundTo3(PI/2-0.001),DEFAULT_ANGLE,ANGLE_SLIDER_COLOR,"Angle of Incidence, \u03B8",-LABEL_OFFSET);
 
 var AIR_TEXT_X_LOCATION = SLIDER_WIDTH/80+STANDARD_MARGIN;
 var WATER_TEXT_X_LOCATION = 17*SLIDER_WIDTH/75+STANDARD_MARGIN;
@@ -312,6 +312,19 @@ reflBeamUpdate(0,DEFAULT_UPPER_RECT_COLOR);
 emitterUpdate();
 initBeamUpdate();
 
+var THETA_SYMBOL_SCALING_FACTOR = 30;
+
+function thetaSymbolUpdate(incidenceAngle){
+  //if(incidenceAngle>0.5){
+    var labelX = BEAM_CONTACT_POINT_X - EMITTER_CONTACT_DISTANCE/4 * Math.sin(incidenceAngle/2);
+    var labelY = BEAM_CONTACT_POINT_Y - EMITTER_CONTACT_DISTANCE/4 * Math.cos(incidenceAngle/2);
+    thetaSymbol = canvas.text(labelX,labelY,'\u03B8')
+                        .attr({'font-size':THETA_SYMBOL_SCALING_FACTOR*incidenceAngle});
+  //}
+}
+
+thetaSymbolUpdate(angle);
+
 /* Reflection and Propagation Quantity Text Constants */
 var BIG_FONT_SIZE=Math.min(20,WH_MIN/31);
 var BIG_TEXT_MARGIN=BIG_FONT_SIZE/4;
@@ -429,6 +442,7 @@ function removeOldVersions(){
   propLabel.remove();
   reflText.remove();
   propText.remove();
+  thetaSymbol.remove();
 }
 
 function updateAngle(){
@@ -463,6 +477,7 @@ function updateAngle(){
   reflPropTextUpdate(fracRefl,fracProp,index1,index2);
   reflLabel.toFront();
   propLabel.toFront();
+  thetaSymbolUpdate(angle);
 }
 
 /* Calls updateAngle() every 20 milliseconds */
