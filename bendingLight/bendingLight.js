@@ -40,6 +40,11 @@ var NORMAL_SHOWN_DEFAULT = true;
 var DEFAULT_UPPER_RECT_COLOR = '#E0E0FF';
 var DEFAULT_LOWER_RECT_COLOR = '#A0A0FF';
 
+/* Rounds a number to three decimal places */
+function roundTo3(x){
+  return parseFloat(x).toFixed(3);
+}
+
 /* Makes a Raphael path for a line from a list of two (X,Y) coordinates */
 function makePathForLine(loC){ // loC is a list of coordinates
   return "m"+loC[0][0]+","+loC[0][1]+"L"+loC[1][0]+","+loC[1][1];
@@ -139,7 +144,7 @@ var MIDDLE_TEXT_OFFSET = 11; // Derived quantity, could be redefined in terms of
 var SLIDER_SPACING = SLIDER_HEIGHT+20;
 var upperIndexSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING*2-COMPARISONS_OFFSET-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX1_DEFAULT,INDEX_SLIDER_COLOR,"Upper Material Index of Refraction",-LABEL_OFFSET);
 var lowerIndexSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-SLIDER_SPACING-COMPARISONS_OFFSET-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,1,2.5,INDEX2_DEFAULT,INDEX_SLIDER_COLOR,"Lower Material Index of Refraction",SLIDER_HEIGHT+LABEL_OFFSET);
-var angleSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,0,PI/2-0.001,DEFAULT_ANGLE,ANGLE_SLIDER_COLOR,"Angle of Incidence (Radians)",-LABEL_OFFSET);
+var angleSlider = new slider(canvas,STANDARD_MARGIN,SIM_HEIGHT-SLIDER_HEIGHT-STANDARD_MARGIN,SLIDER_WIDTH,SLIDER_HEIGHT,0,roundTo3(PI/2-0.001),DEFAULT_ANGLE,ANGLE_SLIDER_COLOR,"Angle of Incidence (Radians)",-LABEL_OFFSET);
 
 var AIR_TEXT_X_LOCATION = SLIDER_WIDTH/80+STANDARD_MARGIN;
 var WATER_TEXT_X_LOCATION = 17*SLIDER_WIDTH/75+STANDARD_MARGIN;

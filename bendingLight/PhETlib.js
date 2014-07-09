@@ -19,8 +19,8 @@ function slider(canvas, x, y, w, h, minVal, maxVal, defaultVal, handleColor, lab
 	body.attr({fill:'white'});
 	handle.attr({fill:handleColor});
 	body.node.className = 'slider';
-	canvas.text(x, (y - 7), minVal);
-	canvas.text((x + w), (y - 7), maxVal);
+	canvas.text(x, (y + labelVerticalOffset), minVal);
+	canvas.text((x + w), (y + labelVerticalOffset), maxVal);
 	
 	function updateDisplay() {
 		var handleX = handle.attr('x');
