@@ -8,24 +8,26 @@ var GLASS_INDEX = 1.6;
 
 /* Color constants */
 var EMITTER_COLOR = '#808080';
-var BUTTON_COLOR_UNPRESSED = '#FF0000';
-var BUTTON_COLOR_PRESSED = '#800000';
-var LASER_VIEW_BOX_COLOR = '#E0E0E0';
-var MATERIAL_BOX_COLOR = LASER_VIEW_BOX_COLOR;
-var RESET_BUTTON_COLOR = '#E0E000';
+// var BUTTON_COLOR_UNPRESSED = '#FF0000';
+// var BUTTON_COLOR_PRESSED = '#800000';
+// var LASER_VIEW_BOX_COLOR = '#E0E0E0';
+// var MATERIAL_BOX_COLOR = LASER_VIEW_BOX_COLOR;
+// var RESET_BUTTON_COLOR = '#E0E000';
 var FULL_BEAM_COLOR = "#FF0000";
-var REFL_TEXT_COLOR = "#FFA000";
-var PROP_TEXT_COLOR = "#A0FF00";
+var REFL_TEXT_MAX_COLOR = "#FFA000";
+var REFL_TEXT_MIN_COLOR = "#906000";
+var PROP_TEXT_MAX_COLOR = "#A0FF00";
+var PROP_TEXT_MIN_COLOR = "#609000";
 var INDEX_SLIDER_COLOR = "#00A000";
 var ANGLE_SLIDER_COLOR = "#FFFF00";
 
 /* Text constants */
-var LASER_VIEW_TITLE_TEXT = "Laser View";
-var LASER_VIEW_CHOICES = ["Ray" , "Wave"];
-var LASER_VIEW_UNITS = "nm";
-var MATERIAL_TAG = "Material: ";
-var MATERIAL_IOR_TAG = "Index of Refraction: ";
-var RESET_BUTTON_TEXT = "Reset All";
+// var LASER_VIEW_TITLE_TEXT = "Laser View";
+// var LASER_VIEW_CHOICES = ["Ray" , "Wave"];
+// var LASER_VIEW_UNITS = "nm";
+// var MATERIAL_TAG = "Material: ";
+// var MATERIAL_IOR_TAG = "Index of Refraction: ";
+// var RESET_BUTTON_TEXT = "Reset All";
 
 /* Defaults */
 var INDICES = {'Air':AIR_INDEX,'Water':WATER_INDEX,'Glass':GLASS_INDEX};
@@ -106,8 +108,8 @@ function getColorFracFromAToB(colorA,colorB,fracFromAToB){
 }
 
 /* Simulation Setup */
-var SIM_WIDTH = 800; 
-var SIM_HEIGHT = 500;
+var SIM_WIDTH = Math.min(1200,$(window).width()); 
+var SIM_HEIGHT = Math.min(600,$(window).width());
 var WH_MIN = Math.min(SIM_WIDTH,SIM_HEIGHT); // Minimum of simulation window width and height
 canvas = Raphael(0,0,SIM_WIDTH,SIM_HEIGHT);
 function backgroundUpdate(upColor,loColor){
@@ -277,7 +279,6 @@ function initBeamUpdate(){
 
 /* Reflected Beam Setup and Update */
 function reflBeamUpdate(fracRefl,background){
-  console.log(background);
   var ur_x = Math.tan(angle)*SIM_HEIGHT/2+BEAM_CONTACT_POINT_X; // ur: upper-right
   var ur_y = 0;
   var ur = [ur_x , ur_y];
@@ -290,7 +291,6 @@ function reflBeamUpdate(fracRefl,background){
 
 /* Propagating Beam Setup and Update */
 function propBeamUpdate(fracProp,propAngle,background){
-  console.log("frac"+background);
   var prop_lr_x = Math.tan(propAngle)*SIM_HEIGHT/2+BEAM_CONTACT_POINT_X; // lr: lower-right
   var prop_lr_y = SIM_HEIGHT;
   var prop_lr = [prop_lr_x , prop_lr_y];
@@ -315,26 +315,39 @@ var QUANT_HORIZ_OFFSET=8.5*BIG_FONT_SIZE;
 from BIG_FONT_SIZE to BIG_TEXT_MARGIN, plus 1 for the margin itself, since the vertical
 point of reference for text is the center. */
 
-reflLabel = canvas.text(BIG_TEXT_MARGIN,SIM_HEIGHT/2-3*BIG_TEXT_MARGIN,"Reflected:")
-                  .attr({'font-size':BIG_FONT_SIZE})
-                  .attr({'fill':REFL_TEXT_COLOR})
-                  .attr({'text-anchor':'start'}); // left aligns
-propLabel = canvas.text(BIG_TEXT_MARGIN,SIM_HEIGHT/2+3*BIG_TEXT_MARGIN,"Propagated:")
-                  .attr({'font-size':BIG_FONT_SIZE})
-                  .attr({'fill':PROP_TEXT_COLOR})
-                  .attr({'text-anchor':'start'}); // left aligns
+/* Calculate color to make reflective beam text from index of refraction */
+function getReflTextColor(ioR1){
+  var indexFrac = mapToFrac(ioR1);
+  return getColorFracFromAToB(REFL_TEXT_MIN_COLOR,REFL_TEXT_MAX_COLOR,indexFrac);
+}
+
+/* Calculate color to make reflective beam text from index of refraction */
+function getPropTextColor(ioR2){
+  var indexFrac = mapToFrac(ioR2);
+  return getColorFracFromAToB(PROP_TEXT_MIN_COLOR,PROP_TEXT_MAX_COLOR,indexFrac);
+}
 
 /* Reflection and Propagation Quantity Text Setup and Update */
-function reflPropTextUpdate(fracRefl,fracProp){
+function reflPropTextUpdate(fracRefl,fracProp,ioR1,ioR2){
+  var reflTextColor = getReflTextColor(ioR1);
+  var propTextColor = getPropTextColor(ioR2);
+  reflLabel = canvas.text(BIG_TEXT_MARGIN,SIM_HEIGHT/2-3*BIG_TEXT_MARGIN,"Reflected:")
+                    .attr({'font-size':BIG_FONT_SIZE})
+                    .attr({'fill':reflTextColor})
+                    .attr({'text-anchor':'start'}); // left aligns
+  propLabel = canvas.text(BIG_TEXT_MARGIN,SIM_HEIGHT/2+3*BIG_TEXT_MARGIN,"Propagated:")
+                    .attr({'font-size':BIG_FONT_SIZE})
+                    .attr({'fill':propTextColor})
+                    .attr({'text-anchor':'start'}); // left aligns
   var percentRefl = Math.round(100*fracRefl);
   var percentProp = Math.round(100*fracProp);
   reflText = canvas.text(BIG_TEXT_MARGIN+QUANT_HORIZ_OFFSET,SIM_HEIGHT/2-3*BIG_TEXT_MARGIN,percentRefl+"%")
                    .attr({'font-size':BIG_FONT_SIZE})
-                   .attr({'fill':REFL_TEXT_COLOR})
+                   .attr({'fill':reflTextColor})
                    .attr({'text-anchor':'end'}); // right aligns
   propText = canvas.text(BIG_TEXT_MARGIN+QUANT_HORIZ_OFFSET,SIM_HEIGHT/2+3*BIG_TEXT_MARGIN,percentProp+"%")
                    .attr({'font-size':BIG_FONT_SIZE})
-                   .attr({'fill':PROP_TEXT_COLOR})
+                   .attr({'fill':propTextColor})
                    .attr({'text-anchor':'end'}); // right aligns
 }
 
@@ -350,7 +363,7 @@ function getNewAngleRefraction(n1,th1,n2){
 }
 
 var newAngle = getNewAngleRefraction(index1,angle,index2);
-reflPropTextUpdate(calcReflected(index1,angle,index2,newAngle),calcPropagated(index1,angle,index2,newAngle));
+reflPropTextUpdate(calcReflected(index1,angle,index2,newAngle),calcPropagated(index1,angle,index2,newAngle),index1,index2);
 
 /*
 canvas.text(LASER_VIEW_TL_X+LASER_VIEW_BOX_WIDTH/2,LASER_VIEW_TL_Y+STANDARD_TEXT_MARGIN,LASER_VIEW_TITLE_TEXT);
@@ -406,6 +419,8 @@ function removeOldVersions(){
   //emitterButton.remove();
   upperRect.remove();
   lowerRect.remove();
+  reflLabel.remove();
+  propLabel.remove();
   reflText.remove();
   propText.remove();
 }
@@ -419,8 +434,6 @@ function updateAngle(){
   fracifiedIndex2 = mapToFrac(index2);
   var backgroundColor1 = convertFracOfBlueToColorString(fracifiedIndex1);
   var backgroundColor2 = convertFracOfBlueToColorString(fracifiedIndex2);
-  console.log("BC1"+backgroundColor1);
-  console.log("BC2"+backgroundColor2);
   backgroundUpdate(backgroundColor1, backgroundColor2);
   upperRect.toBack();
   lowerRect.toBack();
@@ -441,7 +454,7 @@ function updateAngle(){
   }
   initBeamUpdate();
   emitterUpdate();
-  reflPropTextUpdate(fracRefl,fracProp);
+  reflPropTextUpdate(fracRefl,fracProp,index1,index2);
   reflLabel.toFront();
   propLabel.toFront();
 }
