@@ -114,8 +114,8 @@ function getColorFracFromAToB(colorA,colorB,fracFromAToB){
 }
 
 /* Simulation Setup */
-var SIM_WIDTH = Math.min(600,$(window).width()); 
-var SIM_HEIGHT = Math.min(500,$(window).width());
+var SIM_WIDTH = Math.min(1200,$(window).width()); 
+var SIM_HEIGHT = Math.min(600,$(window).width());
 var WH_MIN = Math.min(SIM_WIDTH,SIM_HEIGHT); // Minimum of simulation window width and height
 canvas = Raphael(0,0,SIM_WIDTH,SIM_HEIGHT);
 function backgroundUpdate(upColor,loColor){
