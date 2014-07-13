@@ -30,6 +30,9 @@ var BLACK = "#000000";
 // var MATERIAL_IOR_TAG = "Index of Refraction: ";
 // var RESET_BUTTON_TEXT = "Reset All";
 
+/* Updating function called every this number of milliseconds */
+var UPDATE_TIME = 12;
+
 /* Defaults */
 var INDICES = {'Air':AIR_INDEX,'Water':WATER_INDEX,'Glass':GLASS_INDEX};
 var MATERIAL1_DEFAULT = "Air";
@@ -480,5 +483,5 @@ function updateAngle(){
   thetaSymbolUpdate(angle);
 }
 
-/* Calls updateAngle() every 20 milliseconds */
-setInterval(updateAngle,10);
+/* Calls updateAngle() periodically */
+setInterval(updateAngle,UPDATE_TIME);
